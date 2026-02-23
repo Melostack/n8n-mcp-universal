@@ -5,6 +5,7 @@
  * at runtime, enabling flexible deployment scenarios while maintaining
  * backward compatibility with environment-based configuration.
  */
+import { SSRFProtection } from '../utils/ssrf-protection';
 
 export interface InstanceContext {
   /**
@@ -32,56 +33,14 @@ export interface InstanceContext {
 
 /**
  * Validate URL format with enhanced checks
+ * Uses centralized SSRFProtection with 'permissive' mode to allow internal IPs
+ * but block cloud metadata endpoints.
  */
 function isValidUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-
-    // Allow only http and https protocols
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      return false;
-    }
-
-    // Check for reasonable hostname (not empty or invalid)
-    if (!parsed.hostname || parsed.hostname.length === 0) {
-      return false;
-    }
-
-    // Validate port if present
-    if (parsed.port && (isNaN(Number(parsed.port)) || Number(parsed.port) < 1 || Number(parsed.port) > 65535)) {
-      return false;
-    }
-
-    // Allow localhost, IP addresses, and domain names
-    const hostname = parsed.hostname.toLowerCase();
-
-    // Allow localhost for development
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
-      return true;
-    }
-
-    // Basic IPv4 address validation
-    const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (ipv4Pattern.test(hostname)) {
-      const parts = hostname.split('.');
-      return parts.every(part => {
-        const num = parseInt(part, 10);
-        return num >= 0 && num <= 255;
-      });
-    }
-
-    // Basic IPv6 pattern check (simplified)
-    if (hostname.includes(':') || hostname.startsWith('[') && hostname.endsWith(']')) {
-      // Basic IPv6 validation - just checking it's not obviously wrong
-      return true;
-    }
-
-    // Domain name validation - allow subdomains and TLDs
-    const domainPattern = /^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)*[a-zA-Z]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
-    return domainPattern.test(hostname);
-  } catch {
-    return false;
-  }
+  // Use permissive mode by default for instance context (allows localhost/private IPs but blocks metadata)
+  // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (HIGH-03)
+  const validation = SSRFProtection.validateUrlSync(url, 'permissive');
+  return validation.valid;
 }
 
 /**
@@ -137,15 +96,11 @@ export function validateInstanceContext(context: InstanceContext): {
   if (context.n8nApiUrl !== undefined) {
     if (context.n8nApiUrl === '') {
       errors.push(`Invalid n8nApiUrl: empty string - URL is required when field is provided`);
-    } else if (!isValidUrl(context.n8nApiUrl)) {
-      // Provide specific reason for URL invalidity
-      try {
-        const parsed = new URL(context.n8nApiUrl);
-        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-          errors.push(`Invalid n8nApiUrl: URL must use HTTP or HTTPS protocol, got ${parsed.protocol}`);
-        }
-      } catch {
-        errors.push(`Invalid n8nApiUrl: URL format is malformed or incomplete`);
+    } else {
+      // Use SSRFProtection to validate and get specific reason
+      const validation = SSRFProtection.validateUrlSync(context.n8nApiUrl, 'permissive');
+      if (!validation.valid) {
+        errors.push(`Invalid n8nApiUrl: ${validation.reason || 'URL validation failed'}`);
       }
     }
   }
