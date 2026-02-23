@@ -307,7 +307,7 @@ describe('Instance Context Multi-Tenant URL Validation', () => {
 
       // Test discrepancies between isInstanceContext and validateInstanceContext
       describe('Validation discrepancies', () => {
-        it('should handle URLs that pass validateInstanceContext but fail isInstanceContext', () => {
+        it('should handle URLs that might be considered edge cases', () => {
           const edgeCaseUrls = [
             'https://.example.com',  // Leading dot
             'https://example_underscore.com'  // Underscore
@@ -322,10 +322,10 @@ describe('Instance Context Multi-Tenant URL Validation', () => {
             const isValid = isInstanceContext(context);
             const validation = validateInstanceContext(context);
 
-            // Document the current behavior - type guard is stricter
-            expect(isValid).toBe(false);
-            // Note: validateInstanceContext might be more permissive
-            // This shows the current implementation behavior
+            // With centralized validation using SSRFProtection.validateUrlSync (which uses new URL()),
+            // validation is now consistent and more permissive for these patterns (compliant with URL standard)
+            expect(isValid).toBe(true);
+            expect(validation.valid).toBe(true);
           });
         });
 
@@ -397,7 +397,8 @@ describe('Instance Context Multi-Tenant URL Validation', () => {
           const validation = validateInstanceContext(context);
           expect(validation.valid).toBe(false);
           expect(validation.errors).toBeDefined();
-          expect(validation.errors?.[0]).toContain('URL must use HTTP or HTTPS protocol');
+          // Updated error message from SSRFProtection.validateUrlSync
+          expect(validation.errors?.[0]).toContain('Invalid protocol. Only HTTP/HTTPS allowed.');
         });
       });
     });

@@ -15,7 +15,7 @@ import { logger } from './logger';
  */
 
 // Security mode type
-type SecurityMode = 'strict' | 'moderate' | 'permissive';
+export type SecurityMode = 'strict' | 'moderate' | 'permissive';
 
 // Cloud metadata endpoints (ALWAYS blocked in all modes)
 const CLOUD_METADATA = new Set([
@@ -51,6 +51,87 @@ const PRIVATE_IP_RANGES = [
 ];
 
 export class SSRFProtection {
+  /**
+   * Synchronous URL validation (no DNS resolution)
+   * Useful for config validation where async is not possible
+   *
+   * @param urlString - URL to validate
+   * @param mode - Security mode (default: strict)
+   */
+  static validateUrlSync(urlString: string, mode: SecurityMode = 'strict'): {
+    valid: boolean;
+    reason?: string
+  } {
+    try {
+      const url = new URL(urlString);
+
+      // Step 1: Must be HTTP/HTTPS (all modes)
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        return { valid: false, reason: 'Invalid protocol. Only HTTP/HTTPS allowed.' };
+      }
+
+      // Get hostname and strip IPv6 brackets if present
+      let hostname = url.hostname.toLowerCase();
+      if (hostname.startsWith('[') && hostname.endsWith(']')) {
+        hostname = hostname.slice(1, -1);
+      }
+
+      // Step 2: ALWAYS block cloud metadata endpoints (all modes)
+      if (CLOUD_METADATA.has(hostname)) {
+        return { valid: false, reason: 'Cloud metadata endpoint blocked' };
+      }
+
+      // Step 3: Check IP-based restrictions (without DNS resolution)
+      const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+      const isIPv6 = hostname.includes(':');
+      const isIPv4 = ipv4Pattern.test(hostname);
+
+      if (isIPv4 || isIPv6) {
+        const ip = hostname;
+
+        // Check cloud metadata IP
+        if (CLOUD_METADATA.has(ip)) {
+          return { valid: false, reason: 'Cloud metadata IP blocked' };
+        }
+
+        // Check private IP ranges
+        if (mode !== 'permissive') {
+          // IPv4 Private ranges
+          if (isIPv4 && PRIVATE_IP_RANGES.some(regex => regex.test(ip))) {
+            if (mode === 'strict') return { valid: false, reason: 'Private IP address blocked' };
+
+            // moderate: allow if localhost/127.x
+            const isLocalhost = ip.startsWith('127.');
+            if (!isLocalhost) return { valid: false, reason: 'Private IP address blocked' };
+          }
+
+          // IPv6 Private ranges
+          if (isIPv6) {
+            const isLocalhost = ip === '::1';
+            if (mode === 'strict' && isLocalhost) return { valid: false, reason: 'Localhost blocked' };
+            if (mode === 'moderate' && isLocalhost) return { valid: true }; // Allow localhost in moderate
+
+            // Block other IPv6 private ranges
+            if (ip === '::' || ip.startsWith('fe80:') || ip.startsWith('fc00:') || ip.startsWith('fd00:') || ip.startsWith('::ffff:')) {
+              return { valid: false, reason: 'IPv6 private address blocked' };
+            }
+          }
+        }
+      } else {
+        // Hostname is a domain name
+
+        // Strict mode blocks localhost hostname
+        if (mode === 'strict' && LOCALHOST_PATTERNS.has(hostname)) {
+          return { valid: false, reason: 'Localhost blocked' };
+        }
+      }
+
+      return { valid: true };
+    } catch (error) {
+      return { valid: false, reason: 'Invalid URL format' };
+    }
+  }
+
   /**
    * Validate webhook URL for SSRF protection with configurable security modes
    *
