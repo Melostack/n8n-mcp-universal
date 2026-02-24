@@ -9,6 +9,7 @@ import { N8nApiClient } from '../../../../src/services/n8n-api-client';
 import { getN8nCredentials, validateCredentials } from './credentials';
 
 let client: N8nApiClient | null = null;
+let isAccessibleCache: boolean | null = null;
 
 /**
  * Get or create the test n8n API client
@@ -45,21 +46,27 @@ export function getTestN8nClient(): N8nApiClient {
  */
 export function resetTestN8nClient(): void {
   client = null;
+  isAccessibleCache = null;
 }
 
 /**
  * Check if the n8n API is accessible
  *
  * Performs a health check to verify API connectivity.
+ * Caches the result to prevent repeated network calls.
  *
  * @returns true if API is accessible, false otherwise
  */
 export async function isN8nApiAccessible(): Promise<boolean> {
+  if (isAccessibleCache !== null) return isAccessibleCache;
+
   try {
     const client = getTestN8nClient();
     await client.healthCheck();
+    isAccessibleCache = true;
     return true;
   } catch {
+    isAccessibleCache = false;
     return false;
   }
 }
