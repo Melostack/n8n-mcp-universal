@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
-import { getTestN8nClient } from '../utils/n8n-client';
+import { getTestN8nClient, isN8nApiAccessible } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
 import { Workflow } from '../../../../src/types/n8n-api';
 import {
@@ -30,7 +30,14 @@ describe('Integration: handleCreateWorkflow', () => {
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
 
-  beforeEach(() => {
+  beforeEach(async (testContext) => {
+    // Skip if n8n is not accessible
+    if (!await isN8nApiAccessible()) {
+      console.warn('Skipping test - n8n API not accessible');
+      testContext.skip();
+      return;
+    }
+
     context = createTestContext();
     client = getTestN8nClient();
     mcpContext = createMcpContext();
