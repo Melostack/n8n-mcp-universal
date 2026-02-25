@@ -26,7 +26,7 @@ export default mergeConfig(
       },
       // Allow localhost for integration tests (bypass strict SSRF protection)
       env: {
-        WEBHOOK_SECURITY_MODE: 'moderate'
+        WEBHOOK_SECURITY_MODE: 'permissive'
       }
     }
   })
