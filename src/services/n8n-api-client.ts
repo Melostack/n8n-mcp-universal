@@ -36,6 +36,7 @@ export interface N8nApiClientConfig {
   apiKey: string;
   timeout?: number;
   maxRetries?: number;
+  validateBaseUrl?: boolean;
 }
 
 export class N8nApiClient {
@@ -46,7 +47,7 @@ export class N8nApiClient {
   private versionPromise: Promise<N8nVersionInfo | null> | null = null;
 
   constructor(config: N8nApiClientConfig) {
-    const { baseUrl, apiKey, timeout = 30000, maxRetries = 3 } = config;
+    const { baseUrl, apiKey, timeout = 30000, maxRetries = 3, validateBaseUrl = false } = config;
 
     this.maxRetries = maxRetries;
     this.baseUrl = baseUrl;
@@ -64,6 +65,50 @@ export class N8nApiClient {
         'Content-Type': 'application/json',
       },
     });
+
+    // SSRF Protection Interceptor (if enabled)
+    if (validateBaseUrl) {
+      this.client.interceptors.request.use(async (reqConfig: InternalAxiosRequestConfig) => {
+        try {
+          // Dynamic import to avoid circular dependencies
+          const { SSRFProtection } = await import('../utils/ssrf-protection');
+
+          // Construct full URL to validate
+          // reqConfig.url can be relative (e.g., '/workflows') or absolute
+          // reqConfig.baseURL is the base API URL (e.g., 'https://n8n.example.com/api/v1')
+          let fullUrl = reqConfig.url;
+
+          if (reqConfig.url && !reqConfig.url.startsWith('http')) {
+            // Combine baseURL and relative URL
+            // Note: baseURL usually ends with /api/v1, url starts with /
+            const base = reqConfig.baseURL || '';
+            // Ensure we don't duplicate slashes or miss them
+            const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+            const cleanUrl = reqConfig.url.startsWith('/') ? reqConfig.url : `/${reqConfig.url}`;
+            fullUrl = `${cleanBase}${cleanUrl}`;
+          } else if (!reqConfig.url && reqConfig.baseURL) {
+            fullUrl = reqConfig.baseURL;
+          }
+
+          if (fullUrl) {
+            // Validate the URL against SSRF rules
+            // This performs DNS resolution to block private IPs even if hostname is public
+            const validation = await SSRFProtection.validateWebhookUrl(fullUrl);
+
+            if (!validation.valid) {
+              const errorMessage = `SSRF Protection: Blocked request to ${fullUrl} - ${validation.reason}`;
+              logger.warn(errorMessage, { url: fullUrl });
+              throw new Error(errorMessage);
+            }
+          }
+
+          return reqConfig;
+        } catch (error) {
+          // Re-throw errors to cancel request
+          return Promise.reject(error);
+        }
+      });
+    }
 
     // Request interceptor for logging
     this.client.interceptors.request.use(
