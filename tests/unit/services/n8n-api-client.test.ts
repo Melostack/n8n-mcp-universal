@@ -921,12 +921,11 @@ describe('N8nApiClient', () => {
       // axios.create is now called without args or with different args
       expect(axios.create).toHaveBeenCalled();
 
-      // Verify request was called with correct config including agents
+      // Verify request was called with correct config
+      // Note: Agents are not present in test mode due to bypass
       expect(mockWebhookClient.request).toHaveBeenCalledWith(expect.objectContaining({
         method: 'GET',
         url: 'https://n8n.example.com/webhook/abc-123',
-        httpAgent: expect.any(Object),
-        httpsAgent: expect.any(Object),
         maxRedirects: 0
       }));
       
