@@ -1,4 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
+import { lookup } from 'dns/promises';
 import { logger } from '../utils/logger';
 import {
   Workflow,
@@ -338,49 +341,86 @@ export class N8nApiClient {
   async triggerWebhook(request: WebhookRequest): Promise<any> {
     try {
       const { webhookUrl, httpMethod, data, headers, waitForResponse = true } = request;
-
-      // SECURITY: Validate URL for SSRF protection (includes DNS resolution)
-      // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (HIGH-03)
       const { SSRFProtection } = await import('../utils/ssrf-protection');
-      const validation = await SSRFProtection.validateWebhookUrl(webhookUrl);
 
-      if (!validation.valid) {
-        throw new Error(`SSRF protection: ${validation.reason}`);
+      let currentUrl = webhookUrl;
+      let redirectCount = 0;
+      const maxRedirects = 5;
+
+      while (redirectCount <= maxRedirects) {
+        // SECURITY: Validate URL for SSRF protection
+        // This includes checking against local/private IPs and cloud metadata
+        const validation = await SSRFProtection.validateWebhookUrl(currentUrl);
+
+        if (!validation.valid) {
+          throw new Error(`SSRF protection: ${validation.reason}`);
+        }
+
+        const urlObj = new URL(currentUrl);
+
+        // SECURITY: Pin DNS resolution to the validated IP
+        // This prevents TOCTOU (Time-of-Check to Time-of-Use) attacks via DNS rebinding
+        const customLookup = (
+          hostname: string,
+          _options: any,
+          callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void
+        ) => {
+          if (hostname === urlObj.hostname && validation.resolvedIP) {
+            // Use the already-validated IP
+            callback(null, validation.resolvedIP, validation.family || 4);
+          } else {
+            // Fallback for other hostnames (should not happen in this flow)
+            lookup(hostname).then(
+              res => callback(null, res.address, res.family),
+              err => callback(err as NodeJS.ErrnoException, '', 0)
+            );
+          }
+        };
+
+        const agentOptions = { lookup: customLookup };
+        const httpAgent = new HttpAgent(agentOptions);
+        const httpsAgent = new HttpsAgent(agentOptions);
+
+        // Configure request with manual redirect handling
+        const config: AxiosRequestConfig = {
+          method: httpMethod,
+          url: urlObj.pathname + urlObj.search,
+          baseURL: urlObj.origin,
+          headers: {
+            ...headers,
+            // Don't override API key header for webhook endpoints
+            'X-N8N-API-KEY': undefined,
+          },
+          data: httpMethod !== 'GET' ? data : undefined,
+          params: httpMethod === 'GET' ? data : undefined,
+          timeout: waitForResponse ? 120000 : 30000,
+          httpAgent,
+          httpsAgent,
+          maxRedirects: 0, // Disable auto-redirects to validate each step
+          validateStatus: (status: number) => status < 500 || (status >= 300 && status < 400),
+        };
+
+        // Create a fresh client for this request to avoid interceptors
+        const webhookClient = axios.create();
+        const response = await webhookClient.request(config);
+
+        // Handle redirects
+        if (response.status >= 300 && response.status < 400 && response.headers.location) {
+          redirectCount++;
+          // Resolve relative URLs against current URL
+          currentUrl = new URL(response.headers.location, currentUrl).toString();
+          continue;
+        }
+
+        return {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
+          headers: response.headers,
+        };
       }
 
-      // Extract path from webhook URL
-      const url = new URL(webhookUrl);
-      const webhookPath = url.pathname;
-      
-      // Make request directly to webhook endpoint
-      const config: AxiosRequestConfig = {
-        method: httpMethod,
-        url: webhookPath,
-        headers: {
-          ...headers,
-          // Don't override API key header for webhook endpoints
-          'X-N8N-API-KEY': undefined,
-        },
-        data: httpMethod !== 'GET' ? data : undefined,
-        params: httpMethod === 'GET' ? data : undefined,
-        // Webhooks might take longer
-        timeout: waitForResponse ? 120000 : 30000,
-      };
-
-      // Create a new axios instance for webhook requests to avoid API interceptors
-      const webhookClient = axios.create({
-        baseURL: new URL('/', webhookUrl).toString(),
-        validateStatus: (status: number) => status < 500, // Don't throw on 4xx
-      });
-
-      const response = await webhookClient.request(config);
-      
-      return {
-        status: response.status,
-        statusText: response.statusText,
-        data: response.data,
-        headers: response.headers,
-      };
+      throw new Error(`Too many redirects (max: ${maxRedirects})`);
     } catch (error) {
       throw handleN8nApiError(error);
     }
