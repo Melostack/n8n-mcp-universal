@@ -924,8 +924,7 @@ describe('N8nApiClient', () => {
       // Verify request was called with correct config including agents
       expect(mockWebhookClient.request).toHaveBeenCalledWith(expect.objectContaining({
         method: 'GET',
-        url: '/webhook/abc-123',
-        baseURL: 'https://n8n.example.com',
+        url: 'https://n8n.example.com/webhook/abc-123',
         httpAgent: expect.any(Object),
         httpsAgent: expect.any(Object),
         maxRedirects: 0
@@ -960,7 +959,7 @@ describe('N8nApiClient', () => {
       
       expect(mockWebhookClient.request).toHaveBeenCalledWith(expect.objectContaining({
         method: 'POST',
-        url: '/webhook/abc-123',
+        url: 'https://n8n.example.com/webhook/abc-123',
         headers: {
           'Custom-Header': 'test',
           'X-N8N-API-KEY': undefined,

@@ -1,7 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
-import { Agent as HttpAgent } from 'http';
-import { Agent as HttpsAgent } from 'https';
-import { lookup } from 'dns/promises';
 import { logger } from '../utils/logger';
 import {
   Workflow,
@@ -342,6 +339,9 @@ export class N8nApiClient {
     try {
       const { webhookUrl, httpMethod, data, headers, waitForResponse = true } = request;
       const { SSRFProtection } = await import('../utils/ssrf-protection');
+      const { Agent: HttpAgent } = await import('http');
+      const { Agent: HttpsAgent } = await import('https');
+      const { lookup } = await import('dns/promises');
 
       let currentUrl = webhookUrl;
       let redirectCount = 0;
@@ -384,8 +384,7 @@ export class N8nApiClient {
         // Configure request with manual redirect handling
         const config: AxiosRequestConfig = {
           method: httpMethod,
-          url: urlObj.pathname + urlObj.search,
-          baseURL: urlObj.origin,
+          url: currentUrl, // Use full URL to preserve credentials (user:pass@host)
           headers: {
             ...headers,
             // Don't override API key header for webhook endpoints
