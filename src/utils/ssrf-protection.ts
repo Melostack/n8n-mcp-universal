@@ -50,6 +50,13 @@ const PRIVATE_IP_RANGES = [
   /^0\./,                           // 0.0.0.0/8 (Invalid)
 ];
 
+export interface SSRFValidationResult {
+  valid: boolean;
+  reason?: string;
+  resolvedIP?: string;
+  family?: number;
+}
+
 export class SSRFProtection {
   /**
    * Validate webhook URL for SSRF protection with configurable security modes
@@ -68,12 +75,9 @@ export class SSRFProtection {
    * // Local development (moderate mode)
    * process.env.WEBHOOK_SECURITY_MODE = 'moderate';
    * const result = await SSRFProtection.validateWebhookUrl('http://localhost:5678');
-   * // { valid: true }
+   * // { valid: true, resolvedIP: '127.0.0.1', family: 4 }
    */
-  static async validateWebhookUrl(urlString: string): Promise<{
-    valid: boolean;
-    reason?: string
-  }> {
+  static async validateWebhookUrl(urlString: string): Promise<SSRFValidationResult> {
     try {
       const url = new URL(urlString);
       const mode: SecurityMode = (process.env.WEBHOOK_SECURITY_MODE || 'strict') as SecurityMode;
@@ -99,11 +103,13 @@ export class SSRFProtection {
       // Step 3: Resolve DNS to get actual IP address
       // This prevents DNS rebinding attacks where hostname resolves to different IPs
       let resolvedIP: string;
+      let family: number;
       try {
-        const { address } = await lookup(hostname);
-        resolvedIP = address;
+        const result = await lookup(hostname);
+        resolvedIP = result.address;
+        family = result.family;
 
-        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, mode });
+        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, family, mode });
       } catch (error) {
         logger.warn('DNS resolution failed for webhook URL', {
           hostname,
@@ -130,7 +136,7 @@ export class SSRFProtection {
           hostname,
           resolvedIP
         });
-        return { valid: true };
+        return { valid: true, resolvedIP, family };
       }
 
       // Check if target is localhost
@@ -150,7 +156,7 @@ export class SSRFProtection {
       // MODE: moderate - Allow localhost, block private IPs
       if (mode === 'moderate' && isLocalhost) {
         logger.info('Localhost webhook allowed (moderate mode)', { hostname, resolvedIP });
-        return { valid: true };
+        return { valid: true, resolvedIP, family };
       }
 
       // Step 6: Check private IPv4 ranges (strict & moderate modes)
@@ -179,9 +185,27 @@ export class SSRFProtection {
         return { valid: false, reason: 'IPv6 private address not allowed' };
       }
 
-      return { valid: true };
+      return { valid: true, resolvedIP, family };
     } catch (error) {
       return { valid: false, reason: 'Invalid URL format' };
     }
+  }
+
+  /**
+   * Get a custom lookup function for Axios that pins the DNS resolution to the validated IP.
+   * This prevents TOCTOU (Time-of-Check Time-of-Use) DNS rebinding attacks.
+   *
+   * @param ip - The resolved IP address from validateWebhookUrl
+   * @param family - The IP family (4 or 6) from validateWebhookUrl
+   * @returns A lookup function compatible with dns.lookup signature
+   */
+  static getAxiosLookup(ip: string, family: number = 4): any {
+    // Cast to any to strictly bypass all TypeScript incompatibility issues
+    // Node.js HTTP/HTTPS agents expect a specific signature, and Axios typings might be slightly off
+    // or stricter than needed. Since we know this works at runtime in Node, 'any' is safe here.
+    return (hostname: string, options: any, callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
+      logger.debug(`Using pinned DNS resolution for ${hostname} -> ${ip} (family: ${family})`);
+      callback(null, ip, family);
+    };
   }
 }
