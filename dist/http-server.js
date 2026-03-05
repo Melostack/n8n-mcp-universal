@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadAuthToken = loadAuthToken;
 exports.startFixedHTTPServer = startFixedHTTPServer;
 const express_1 = __importDefault(require("express"));
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const tools_1 = require("./mcp/tools");
 const tools_n8n_manager_1 = require("./mcp/tools-n8n-manager");
 const server_1 = require("./mcp/server");
@@ -212,36 +211,7 @@ async function startFixedHTTPServer() {
             documentation: 'https://github.com/czlonkowski/n8n-mcp'
         });
     });
-    const authLimiter = (0, express_rate_limit_1.default)({
-        windowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW || '900000'),
-        max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20'),
-        message: {
-            jsonrpc: '2.0',
-            error: {
-                code: -32000,
-                message: 'Too many authentication attempts. Please try again later.'
-            },
-            id: null
-        },
-        standardHeaders: true,
-        legacyHeaders: false,
-        handler: (req, res) => {
-            logger_1.logger.warn('Rate limit exceeded', {
-                ip: req.ip,
-                userAgent: req.get('user-agent'),
-                event: 'rate_limit'
-            });
-            res.status(429).json({
-                jsonrpc: '2.0',
-                error: {
-                    code: -32000,
-                    message: 'Too many authentication attempts'
-                },
-                id: null
-            });
-        }
-    });
-    app.post('/mcp', authLimiter, async (req, res) => {
+    app.post('/mcp', async (req, res) => {
         const startTime = Date.now();
         const authHeader = req.headers.authorization;
         if (!authHeader) {

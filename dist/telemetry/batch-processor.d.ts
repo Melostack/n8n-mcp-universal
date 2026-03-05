@@ -12,8 +12,6 @@ export declare class TelemetryBatchProcessor {
     private flushTimes;
     private deadLetterQueue;
     private readonly maxDeadLetterSize;
-    private eventListeners;
-    private started;
     constructor(supabase: SupabaseClient | null, isEnabled: () => boolean);
     start(): void;
     stop(): void;
