@@ -8,7 +8,7 @@ import { TelemetryConfigManager } from './config-manager';
 import { TelemetryEventTracker } from './event-tracker';
 import { TelemetryBatchProcessor } from './batch-processor';
 import { TelemetryPerformanceMonitor } from './performance-monitor';
-import { TELEMETRY_BACKEND } from './telemetry-types';
+
 import { TelemetryError, TelemetryErrorType, TelemetryErrorAggregator } from './telemetry-error';
 import { logger } from '../utils/logger';
 

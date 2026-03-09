@@ -4,7 +4,7 @@ import { TelemetryConfigManager } from '../../../src/telemetry/config-manager';
 import { TelemetryEventTracker } from '../../../src/telemetry/event-tracker';
 import { TelemetryBatchProcessor } from '../../../src/telemetry/batch-processor';
 import { createClient } from '@supabase/supabase-js';
-import { TELEMETRY_BACKEND } from '../../../src/telemetry/telemetry-types';
+
 import { TelemetryError, TelemetryErrorType } from '../../../src/telemetry/telemetry-error';
 
 // Mock all dependencies

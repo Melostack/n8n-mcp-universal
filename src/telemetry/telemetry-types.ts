@@ -100,11 +100,6 @@ export const TELEMETRY_CONFIG = {
   MAX_BATCH_SIZE: 50, // Maximum events per batch
 } as const;
 
-export const TELEMETRY_BACKEND = {
-  URL: '',
-  ANON_KEY: ''
-} as const;
-
 export interface TelemetryMetrics {
   eventsTracked: number;
   eventsDropped: number;
