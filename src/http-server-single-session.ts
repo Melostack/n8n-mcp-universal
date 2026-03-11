@@ -790,6 +790,7 @@ export class SingleSessionHTTPServer {
    */
   async start(): Promise<void> {
     const app = express();
+    app.disable('x-powered-by');
     
     // Create JSON parser middleware for endpoints that need it
     const jsonParser = express.json({ limit: '10mb' });
@@ -810,6 +811,7 @@ export class SingleSessionHTTPServer {
       res.setHeader('X-Frame-Options', 'DENY');
       res.setHeader('X-XSS-Protection', '1; mode=block');
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+      res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
       next();
     });
     
