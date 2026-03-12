@@ -10,7 +10,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleListExecutions } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleListExecutions', () => {
+describeIfApiAccessible('Integration: handleListExecutions', () => {
   let mcpContext: InstanceContext;
 
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('Integration: handleListExecutions', () => {
   // No Filters
   // ======================================================================
 
-  describe('No Filters', () => {
+  describeIfApiAccessible('No Filters', () => {
     it('should list all executions without filters', async () => {
       const response = await handleListExecutions({}, mcpContext);
 
@@ -38,7 +38,7 @@ describe('Integration: handleListExecutions', () => {
   // Filter by Status
   // ======================================================================
 
-  describe('Filter by Status', () => {
+  describeIfApiAccessible('Filter by Status', () => {
     it('should filter executions by success status', async () => {
       const response = await handleListExecutions(
         { status: 'success' },
@@ -92,7 +92,7 @@ describe('Integration: handleListExecutions', () => {
   // Pagination
   // ======================================================================
 
-  describe('Pagination', () => {
+  describeIfApiAccessible('Pagination', () => {
     it('should return first page with limit', async () => {
       const response = await handleListExecutions(
         { limit: 10 },
@@ -177,7 +177,7 @@ describe('Integration: handleListExecutions', () => {
   // Include Execution Data
   // ======================================================================
 
-  describe('Include Execution Data', () => {
+  describeIfApiAccessible('Include Execution Data', () => {
     it('should exclude execution data by default', async () => {
       const response = await handleListExecutions(
         { limit: 5 },
@@ -208,7 +208,7 @@ describe('Integration: handleListExecutions', () => {
   // Empty Results
   // ======================================================================
 
-  describe('Empty Results', () => {
+  describeIfApiAccessible('Empty Results', () => {
     it('should return empty array when no executions match filters', async () => {
       // Use a very restrictive workflowId that likely doesn't exist
       const response = await handleListExecutions(
@@ -228,7 +228,7 @@ describe('Integration: handleListExecutions', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete list response structure', async () => {
       const response = await handleListExecutions(
         { limit: 10 },

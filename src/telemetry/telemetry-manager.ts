@@ -68,6 +68,10 @@ export class TelemetryManager {
    * Initialize telemetry if enabled
    */
   private initialize(): void {
+    if (this.isInitialized) {
+      return; // Already initialized
+    }
+
     if (!this.configManager.isEnabled()) {
       logger.debug('Telemetry disabled by user preference');
       return;

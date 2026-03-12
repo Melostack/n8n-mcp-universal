@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -18,7 +20,7 @@ import { getNodeRepository, closeNodeRepository } from '../utils/node-repository
 import { NodeRepository } from '../../../../src/database/node-repository';
 import { ValidationResponse } from '../types/mcp-responses';
 
-describe('Integration: handleValidateWorkflow', () => {
+describeIfApiAccessible('Integration: handleValidateWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -46,7 +48,7 @@ describe('Integration: handleValidateWorkflow', () => {
   // Valid Workflow - All Profiles
   // ======================================================================
 
-  describe('Valid Workflow', () => {
+  describeIfApiAccessible('Valid Workflow', () => {
     it('should validate valid workflow with default profile (runtime)', async () => {
       // Create valid workflow
       const workflow = {
@@ -152,7 +154,7 @@ describe('Integration: handleValidateWorkflow', () => {
   // Invalid Workflow - Error Detection
   // ======================================================================
 
-  describe('Invalid Workflow Detection', () => {
+  describeIfApiAccessible('Invalid Workflow Detection', () => {
     it('should detect invalid node type', async () => {
       // Create workflow with invalid node type
       const workflow = {
@@ -251,7 +253,7 @@ describe('Integration: handleValidateWorkflow', () => {
   // Selective Validation
   // ======================================================================
 
-  describe('Selective Validation', () => {
+  describeIfApiAccessible('Selective Validation', () => {
     it('should validate nodes only (skip connections)', async () => {
       const workflow = {
         ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -341,7 +343,7 @@ describe('Integration: handleValidateWorkflow', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should handle non-existent workflow ID', async () => {
       const response = await handleValidateWorkflow(
         { id: '99999999' },
@@ -381,7 +383,7 @@ describe('Integration: handleValidateWorkflow', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete validation response structure', async () => {
       const workflow = {
         ...SIMPLE_WEBHOOK_WORKFLOW,

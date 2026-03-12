@@ -11,7 +11,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleHealthCheck } from '../../../../src/mcp/handlers-n8n-manager';
 import { HealthCheckResponse } from '../utils/response-types';
 
-describe('Integration: handleHealthCheck', () => {
+describeIfApiAccessible('Integration: handleHealthCheck', () => {
   let mcpContext: InstanceContext;
 
   beforeEach(() => {
@@ -22,7 +22,7 @@ describe('Integration: handleHealthCheck', () => {
   // Successful Health Check
   // ======================================================================
 
-  describe('API Available', () => {
+  describeIfApiAccessible('API Available', () => {
     it('should successfully check n8n API health', async () => {
       const response = await handleHealthCheck(mcpContext);
 
@@ -102,7 +102,7 @@ describe('Integration: handleHealthCheck', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete health check response structure', async () => {
       const response = await handleHealthCheck(mcpContext);
 

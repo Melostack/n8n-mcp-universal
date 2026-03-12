@@ -11,7 +11,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleDeleteExecution, handleTriggerWebhookWorkflow, handleGetExecution } from '../../../../src/mcp/handlers-n8n-manager';
 import { getN8nCredentials } from '../utils/credentials';
 
-describe('Integration: handleDeleteExecution', () => {
+describeIfApiAccessible('Integration: handleDeleteExecution', () => {
   let mcpContext: InstanceContext;
   let webhookUrl: string;
 
@@ -28,7 +28,7 @@ describe('Integration: handleDeleteExecution', () => {
   // Successful Deletion
   // ======================================================================
 
-  describe('Successful Deletion', () => {
+  describeIfApiAccessible('Successful Deletion', () => {
     it('should delete an execution successfully', async () => {
       // First, create an execution to delete
       const triggerResponse = await handleTriggerWebhookWorkflow(
@@ -114,7 +114,7 @@ describe('Integration: handleDeleteExecution', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should handle non-existent execution ID', async () => {
       const response = await handleDeleteExecution(
         { id: '99999999' },

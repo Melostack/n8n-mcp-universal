@@ -25,7 +25,7 @@ export default mergeConfig(
         enabled: false
       },
       env: {
-        WEBHOOK_SECURITY_MODE: 'permissive',
+        WEBHOOK_SECURITY_MODE: 'moderate',
         NODE_ENV: 'test'
       }
     }

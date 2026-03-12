@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -16,7 +17,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { NodeRepository } from '../../../../src/database/node-repository';
 import { handleUpdateWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleUpdateWorkflow', () => {
+describeIfApiAccessible('Integration: handleUpdateWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -43,7 +44,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Full Workflow Replacement
   // ======================================================================
 
-  describe('Full Workflow Replacement', () => {
+  describeIfApiAccessible('Full Workflow Replacement', () => {
     it('should replace entire workflow with new nodes and connections', async () => {
       // Create initial simple workflow
       const initialWorkflow = {
@@ -94,7 +95,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Update Nodes
   // ======================================================================
 
-  describe('Update Nodes', () => {
+  describeIfApiAccessible('Update Nodes', () => {
     it('should update workflow nodes while preserving other properties', async () => {
       // Create workflow
       const workflow = {
@@ -168,7 +169,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Note: "Update Connections" test removed - empty connections invalid for multi-node workflows
   // Connection modifications are tested in update-partial-workflow.test.ts
 
-  describe('Update Settings', () => {
+  describeIfApiAccessible('Update Settings', () => {
     it('should update workflow settings without affecting nodes', async () => {
       // Create workflow
       const workflow = {
@@ -217,7 +218,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Validation Errors
   // ======================================================================
 
-  describe('Validation Errors', () => {
+  describeIfApiAccessible('Validation Errors', () => {
     it('should return error for invalid node types', async () => {
       // Create workflow
       const workflow = {
@@ -275,7 +276,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Update Name Only
   // ======================================================================
 
-  describe('Update Name', () => {
+  describeIfApiAccessible('Update Name', () => {
     it('should update workflow name without affecting structure', async () => {
       // Create workflow
       const workflow = {
@@ -322,7 +323,7 @@ describe('Integration: handleUpdateWorkflow', () => {
   // Multiple Properties Update
   // ======================================================================
 
-  describe('Multiple Properties', () => {
+  describeIfApiAccessible('Multiple Properties', () => {
     it('should update name and settings together', async () => {
       // Create workflow
       const workflow = {

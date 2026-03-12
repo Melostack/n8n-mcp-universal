@@ -11,7 +11,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleGetExecution, handleTriggerWebhookWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 import { getN8nCredentials } from '../utils/credentials';
 
-describe('Integration: handleGetExecution', () => {
+describeIfApiAccessible('Integration: handleGetExecution', () => {
   let mcpContext: InstanceContext;
   let executionId: string;
   let webhookUrl: string;
@@ -51,7 +51,7 @@ describe('Integration: handleGetExecution', () => {
   // Preview Mode
   // ======================================================================
 
-  describe('Preview Mode', () => {
+  describeIfApiAccessible('Preview Mode', () => {
     it('should get execution in preview mode (structure only)', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -84,7 +84,7 @@ describe('Integration: handleGetExecution', () => {
   // Summary Mode (Default)
   // ======================================================================
 
-  describe('Summary Mode', () => {
+  describeIfApiAccessible('Summary Mode', () => {
     it('should get execution in summary mode (2 samples per node)', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -131,7 +131,7 @@ describe('Integration: handleGetExecution', () => {
   // Filtered Mode
   // ======================================================================
 
-  describe('Filtered Mode', () => {
+  describeIfApiAccessible('Filtered Mode', () => {
     it('should get execution with custom items limit', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -225,7 +225,7 @@ describe('Integration: handleGetExecution', () => {
   // Full Mode
   // ======================================================================
 
-  describe('Full Mode', () => {
+  describeIfApiAccessible('Full Mode', () => {
     it('should get complete execution data', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -257,7 +257,7 @@ describe('Integration: handleGetExecution', () => {
   // Input Data Inclusion
   // ======================================================================
 
-  describe('Input Data Inclusion', () => {
+  describeIfApiAccessible('Input Data Inclusion', () => {
     it('should include input data when requested', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -307,7 +307,7 @@ describe('Integration: handleGetExecution', () => {
   // Legacy Parameter Compatibility
   // ======================================================================
 
-  describe('Legacy Parameter Compatibility', () => {
+  describeIfApiAccessible('Legacy Parameter Compatibility', () => {
     it('should support legacy includeData parameter', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');
@@ -334,7 +334,7 @@ describe('Integration: handleGetExecution', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should handle non-existent execution ID', async () => {
       const response = await handleGetExecution(
         {
@@ -392,7 +392,7 @@ describe('Integration: handleGetExecution', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete execution response structure', async () => {
       if (!executionId) {
         console.warn('Skipping test: No execution ID available');

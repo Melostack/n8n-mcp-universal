@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -15,7 +17,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleGetWorkflowStructure } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleGetWorkflowStructure', () => {
+describeIfApiAccessible('Integration: handleGetWorkflowStructure', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -40,7 +42,7 @@ describe('Integration: handleGetWorkflowStructure', () => {
   // Simple Workflow Structure
   // ======================================================================
 
-  describe('Simple Workflow', () => {
+  describeIfApiAccessible('Simple Workflow', () => {
     it('should retrieve workflow structure with nodes and connections', async () => {
       // Create a simple workflow
       const workflow = {
@@ -86,7 +88,7 @@ describe('Integration: handleGetWorkflowStructure', () => {
   // Complex Workflow Structure
   // ======================================================================
 
-  describe('Complex Workflow', () => {
+  describeIfApiAccessible('Complex Workflow', () => {
     it('should retrieve complex workflow structure without exposing sensitive parameter data', async () => {
       // Create a complex workflow with multiple nodes
       const workflow = {

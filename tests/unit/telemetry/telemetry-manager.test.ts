@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach, beforeAll, afterAll } from 'vitest';
 import { TelemetryManager, telemetry } from '../../../src/telemetry/telemetry-manager';
 import { TelemetryConfigManager } from '../../../src/telemetry/config-manager';
 import { TelemetryEventTracker } from '../../../src/telemetry/event-tracker';
@@ -32,6 +32,12 @@ describe('TelemetryManager', () => {
   let mockEventTracker: any;
   let mockBatchProcessor: any;
   let manager: TelemetryManager;
+
+  const originalEnv = process.env;
+
+  beforeAll(() => {
+    process.env = { ...originalEnv };
+  });
 
   beforeEach(() => {
     // Reset singleton using the new method
@@ -116,8 +122,11 @@ describe('TelemetryManager', () => {
   afterEach(() => {
     // Clean up global state
     TelemetryManager.resetInstance();
-    delete process.env.SUPABASE_URL;
-    delete process.env.SUPABASE_ANON_KEY;
+    process.env = { ...originalEnv };
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
   });
 
   describe('singleton behavior', () => {

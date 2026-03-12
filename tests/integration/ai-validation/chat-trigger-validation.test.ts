@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../n8n-api/utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../n8n-api/utils/test-context';
 import { getTestN8nClient } from '../n8n-api/utils/n8n-client';
 import { N8nApiClient } from '../../../src/services/n8n-api-client';
@@ -27,7 +28,7 @@ import {
 } from './helpers';
 import { WorkflowNode } from '../../../src/types/n8n-api';
 
-describe('Integration: Chat Trigger Validation', () => {
+describeIfApiAccessible('Integration: Chat Trigger Validation', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
