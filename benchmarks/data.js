@@ -1,6 +1,6 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770874217915,
-  "repoUrl": "https://github.com/matheusmelo-cabelo/n8n-mcp-universal",
+  "lastUpdate": 1773339057660,
+  "repoUrl": "https://github.com/Melostack/n8n-mcp-universal",
   "entries": {
     "n8n-mcp Benchmarks": [
       {
@@ -54,6 +54,37 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/matheusmelo-cabelo/n8n-mcp-universal/commit/a1bb5c1696e5a3fa95deb3f98906d96ba4c961bc"
         },
         "date": 1770874217535,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "sample - array sorting - small",
+            "value": 0.0136,
+            "range": "0.3096",
+            "unit": "ms",
+            "extra": "73341 ops/sec"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "backup.matheusmelo@gmail.com",
+            "name": "Matheus “Melostack” MeloX",
+            "username": "Melostack"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bd7afd192b54a6894ff58b57455f7a8e4baad962",
+          "message": "Configure Jules auto-response for CodeRabbit",
+          "timestamp": "2026-03-12T15:08:44-03:00",
+          "tree_id": "3e049c0c772f764376fc2b9566fc82ff2e2fb76d",
+          "url": "https://github.com/Melostack/n8n-mcp-universal/commit/bd7afd192b54a6894ff58b57455f7a8e4baad962"
+        },
+        "date": 1773339056972,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
