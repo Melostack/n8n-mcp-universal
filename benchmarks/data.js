@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773339109789,
+  "lastUpdate": 1773339153522,
   "repoUrl": "https://github.com/Melostack/n8n-mcp-universal",
   "entries": {
     "n8n-mcp Benchmarks": [
@@ -116,6 +116,37 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Melostack/n8n-mcp-universal/commit/564b34b569407089c5863c46c4c78ad96057444d"
         },
         "date": 1773339109100,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "sample - array sorting - small",
+            "value": 0.0136,
+            "range": "0.3096",
+            "unit": "ms",
+            "extra": "73341 ops/sec"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "backup.matheusmelo@gmail.com",
+            "name": "Matheus “Melostack” MeloX",
+            "username": "Melostack"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "732f938f8e74629410486841a24b10bee1eff94a",
+          "message": "Add AI review cycle workflow",
+          "timestamp": "2026-03-12T15:10:18-03:00",
+          "tree_id": "1220286ff430b914f65e936bd270f697114eb79c",
+          "url": "https://github.com/Melostack/n8n-mcp-universal/commit/732f938f8e74629410486841a24b10bee1eff94a"
+        },
+        "date": 1773339153260,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
