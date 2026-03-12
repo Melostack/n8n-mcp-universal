@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773339153522,
+  "lastUpdate": 1773341927033,
   "repoUrl": "https://github.com/Melostack/n8n-mcp-universal",
   "entries": {
     "n8n-mcp Benchmarks": [
@@ -147,6 +147,37 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Melostack/n8n-mcp-universal/commit/732f938f8e74629410486841a24b10bee1eff94a"
         },
         "date": 1773339153260,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "sample - array sorting - small",
+            "value": 0.0136,
+            "range": "0.3096",
+            "unit": "ms",
+            "extra": "73341 ops/sec"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "matheus.hmc@proton.me",
+            "name": "Matheus Melo",
+            "username": "theghostwind"
+          },
+          "committer": {
+            "email": "matheus.hmc@proton.me",
+            "name": "Matheus Melo",
+            "username": "theghostwind"
+          },
+          "distinct": true,
+          "id": "6e3b33f865424203cefdb1bd19a830ba8eadc5e8",
+          "message": "chore(ai): configura coordenacao entre Jules e CodeRabbit",
+          "timestamp": "2026-03-12T15:56:20-03:00",
+          "tree_id": "327839488160eb6b4eb437c5cb797b8a3cc358fe",
+          "url": "https://github.com/Melostack/n8n-mcp-universal/commit/6e3b33f865424203cefdb1bd19a830ba8eadc5e8"
+        },
+        "date": 1773341926561,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
