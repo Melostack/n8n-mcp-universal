@@ -1,33 +1,19 @@
-name: AI Review Cycle - Jules & CodeRabbit
-
+name: AI Review Cycle
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
   pull_request_review_comment:
     types: [created]
-
 jobs:
-  handle-coderabbit-feedback:
+  handle-coderabbit:
     runs-on: ubuntu-latest
     if: contains(github.event.comment.user.login, 'coderabbit')
-    
     steps:
-      - name: "Detect CodeRabbit Review Comments"
-        id: detect
-        run: |
-          echo "CodeRabbit feedback detected on PR #${{ github.event.pull_request.number }}"
-          echo "::notice::Triggering Jules auto-response..."
-      
-      - name: "Trigger Jules to Respond"
-        uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = context.issue.number;
-            console.log(`Jules should analyze PR #${prNumber} and respond to CodeRabbit`);
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: prNumber,
-              body: '@jules-ai please review CodeRabbit suggestions and apply fixes if needed'
+              issue_number: context.issue.number,
+              body: '@jules-ai please review CodeRabbit suggestions and apply fixes'
             });
