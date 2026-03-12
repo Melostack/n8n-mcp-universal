@@ -7,7 +7,7 @@ export default mergeConfig(
     test: {
       env: {
         NODE_ENV: 'test',
-        WEBHOOK_SECURITY_MODE: 'permissive'
+        WEBHOOK_SECURITY_MODE: 'moderate'
       },
       // Include global setup, but NOT integration-setup.ts for n8n-api tests
       // (they need real network requests, not MSW mocks)
