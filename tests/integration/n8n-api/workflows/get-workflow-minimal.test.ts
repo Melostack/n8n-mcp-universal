@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -15,7 +17,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleGetWorkflowMinimal } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleGetWorkflowMinimal', () => {
+describeIfApiAccessible('Integration: handleGetWorkflowMinimal', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -40,7 +42,7 @@ describe('Integration: handleGetWorkflowMinimal', () => {
   // Inactive Workflow
   // ======================================================================
 
-  describe('Inactive Workflow', () => {
+  describeIfApiAccessible('Inactive Workflow', () => {
     it('should retrieve minimal data for inactive workflow', async () => {
       // Create workflow (starts inactive by default)
       const workflow = {
@@ -90,7 +92,7 @@ describe('Integration: handleGetWorkflowMinimal', () => {
   // Active Workflow
   // ======================================================================
 
-  describe('Active Workflow', () => {
+  describeIfApiAccessible('Active Workflow', () => {
     it('should retrieve minimal data showing active status', async () => {
       // Create workflow
       const workflow = {

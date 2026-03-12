@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -15,7 +17,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleDeleteWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleDeleteWorkflow', () => {
+describeIfApiAccessible('Integration: handleDeleteWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -40,7 +42,7 @@ describe('Integration: handleDeleteWorkflow', () => {
   // Successful Deletion
   // ======================================================================
 
-  describe('Successful Deletion', () => {
+  describeIfApiAccessible('Successful Deletion', () => {
     it('should delete an existing workflow', async () => {
       // Create workflow
       const workflow = {
@@ -77,7 +79,7 @@ describe('Integration: handleDeleteWorkflow', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should return error for non-existent workflow ID', async () => {
       const response = await handleDeleteWorkflow(
         { id: '99999999' },
@@ -93,7 +95,7 @@ describe('Integration: handleDeleteWorkflow', () => {
   // Cleanup Verification
   // ======================================================================
 
-  describe('Cleanup Verification', () => {
+  describeIfApiAccessible('Cleanup Verification', () => {
     it('should verify workflow is actually deleted from n8n', async () => {
       // Create workflow
       const workflow = {

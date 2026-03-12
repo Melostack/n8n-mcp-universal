@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -17,7 +18,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { NodeRepository } from '../../../../src/database/node-repository';
 import { handleUpdatePartialWorkflow } from '../../../../src/mcp/handlers-workflow-diff';
 
-describe('Integration: handleUpdatePartialWorkflow', () => {
+describeIfApiAccessible('Integration: handleUpdatePartialWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -44,8 +45,8 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
   // NODE OPERATIONS (6 operations)
   // ======================================================================
 
-  describe('Node Operations', () => {
-    describe('addNode', () => {
+  describeIfApiAccessible('Node Operations', () => {
+    describeIfApiAccessible('addNode', () => {
       it('should add a new node to workflow', async () => {
         // Create simple workflow
         const workflow = {
@@ -148,7 +149,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('removeNode', () => {
+    describeIfApiAccessible('removeNode', () => {
       it('should remove node by name', async () => {
         const workflow = {
           ...SIMPLE_HTTP_WORKFLOW,
@@ -218,7 +219,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('updateNode', () => {
+    describeIfApiAccessible('updateNode', () => {
       it('should update node parameters', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -303,7 +304,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('moveNode', () => {
+    describeIfApiAccessible('moveNode', () => {
       it('should move node to new position', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -345,7 +346,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('enableNode / disableNode', () => {
+    describeIfApiAccessible('enableNode / disableNode', () => {
       it('should disable a node', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -438,8 +439,8 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
   // CONNECTION OPERATIONS (5 operations)
   // ======================================================================
 
-  describe('Connection Operations', () => {
-    describe('addConnection', () => {
+  describeIfApiAccessible('Connection Operations', () => {
+    describeIfApiAccessible('addConnection', () => {
       it('should add connection between nodes', async () => {
         // Start with workflow without connections
         const workflow = {
@@ -516,7 +517,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('removeConnection', () => {
+    describeIfApiAccessible('removeConnection', () => {
       it('should reject removal of last connection (creates invalid workflow)', async () => {
         const workflow = {
           ...SIMPLE_HTTP_WORKFLOW,
@@ -585,7 +586,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('replaceConnections', () => {
+    describeIfApiAccessible('replaceConnections', () => {
       it('should reject replacing with empty connections (creates invalid workflow)', async () => {
         const workflow = {
           ...SIMPLE_HTTP_WORKFLOW,
@@ -619,7 +620,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('cleanStaleConnections', () => {
+    describeIfApiAccessible('cleanStaleConnections', () => {
       it('should remove stale connections in dry run mode', async () => {
         const workflow = {
           ...SIMPLE_HTTP_WORKFLOW,
@@ -667,8 +668,8 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
   // METADATA OPERATIONS (4 operations)
   // ======================================================================
 
-  describe('Metadata Operations', () => {
-    describe('updateSettings', () => {
+  describeIfApiAccessible('Metadata Operations', () => {
+    describeIfApiAccessible('updateSettings', () => {
       it('should update workflow settings', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -710,7 +711,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('updateName', () => {
+    describeIfApiAccessible('updateName', () => {
       it('should update workflow name', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -745,7 +746,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
       });
     });
 
-    describe('addTag / removeTag', () => {
+    describeIfApiAccessible('addTag / removeTag', () => {
       it('should add tag to workflow', async () => {
         const workflow = {
           ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -821,7 +822,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
   // ADVANCED SCENARIOS
   // ======================================================================
 
-  describe('Advanced Scenarios', () => {
+  describeIfApiAccessible('Advanced Scenarios', () => {
     it('should apply multiple operations in sequence', async () => {
       const workflow = {
         ...SIMPLE_WEBHOOK_WORKFLOW,
@@ -959,7 +960,7 @@ describe('Integration: handleUpdatePartialWorkflow', () => {
   // WORKFLOW STRUCTURE VALIDATION (prevents corrupted workflows)
   // ======================================================================
 
-  describe('Workflow Structure Validation', () => {
+  describeIfApiAccessible('Workflow Structure Validation', () => {
     it('should reject removal of all connections in multi-node workflow', async () => {
       // Create workflow with 2 nodes and 1 connection
       const workflow = {

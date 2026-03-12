@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -15,7 +16,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleListWorkflows } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleListWorkflows', () => {
+describeIfApiAccessible('Integration: handleListWorkflows', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -40,7 +41,7 @@ describe('Integration: handleListWorkflows', () => {
   // No Filters
   // ======================================================================
 
-  describe('No Filters', () => {
+  describeIfApiAccessible('No Filters', () => {
     it('should list all workflows without filters', async () => {
       // Create a test workflow to ensure at least one exists
       const workflow = {
@@ -82,7 +83,7 @@ describe('Integration: handleListWorkflows', () => {
   // Filter by Active Status
   // ======================================================================
 
-  describe('Filter by Active Status', () => {
+  describeIfApiAccessible('Filter by Active Status', () => {
     it('should filter workflows by active=true', async () => {
       // Create active workflow
       const activeWorkflow = {
@@ -152,7 +153,7 @@ describe('Integration: handleListWorkflows', () => {
   // Filter by Tags
   // ======================================================================
 
-  describe('Filter by Tags', () => {
+  describeIfApiAccessible('Filter by Tags', () => {
     it('should filter workflows by name instead of tags', async () => {
       // Note: Tags filtering requires tag IDs, not names, and tags are readonly in workflow creation
       // This test filters by name instead, which is more reliable for integration testing
@@ -183,7 +184,7 @@ describe('Integration: handleListWorkflows', () => {
   // Pagination
   // ======================================================================
 
-  describe('Pagination', () => {
+  describeIfApiAccessible('Pagination', () => {
     it('should return first page with limit', async () => {
       // Create multiple workflows
       const workflows = [];
@@ -286,7 +287,7 @@ describe('Integration: handleListWorkflows', () => {
   // Limit Variations
   // ======================================================================
 
-  describe('Limit Variations', () => {
+  describeIfApiAccessible('Limit Variations', () => {
     it('should respect limit=1', async () => {
       // Create workflow
       const workflow = {
@@ -341,7 +342,7 @@ describe('Integration: handleListWorkflows', () => {
   // Exclude Pinned Data
   // ======================================================================
 
-  describe('Exclude Pinned Data', () => {
+  describeIfApiAccessible('Exclude Pinned Data', () => {
     it('should exclude pinned data when requested', async () => {
       // Create workflow
       const workflow = {
@@ -373,7 +374,7 @@ describe('Integration: handleListWorkflows', () => {
   // Empty Results
   // ======================================================================
 
-  describe('Empty Results', () => {
+  describeIfApiAccessible('Empty Results', () => {
     it('should return empty array when no workflows match filters', async () => {
       // List with non-existent tag
       const response = await handleListWorkflows(
@@ -394,7 +395,7 @@ describe('Integration: handleListWorkflows', () => {
   // Sort Order Verification
   // ======================================================================
 
-  describe('Sort Order', () => {
+  describeIfApiAccessible('Sort Order', () => {
     it('should return workflows in consistent order', async () => {
       // Create multiple workflows
       for (let i = 0; i < 3; i++) {
