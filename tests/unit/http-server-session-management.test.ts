@@ -113,6 +113,7 @@ const mockHandlers: { [key: string]: any[] } = {
 // Mock Express
 vi.mock('express', () => {
   const mockExpressApp = {
+    disable: vi.fn(),
     get: vi.fn((path: string, ...handlers: any[]) => {
       mockHandlers.get.push({ path, handlers });
       return mockExpressApp;
