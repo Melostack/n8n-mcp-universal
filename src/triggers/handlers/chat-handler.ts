@@ -107,6 +107,9 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
         data: chatPayload,
         timeout: input.timeout || (input.waitForResponse !== false ? 120000 : 30000),
         validateStatus: (status) => status < 500,
+        // SECURITY: Pin DNS resolution to validated IP to prevent DNS rebinding attacks
+        // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (CRITICAL-01)
+        lookup: validation.resolvedIP ? SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family) : undefined,
       };
 
       // Make the request (sync mode - no streaming)

@@ -80,12 +80,9 @@ export class WebhookHandler extends BaseTriggerHandler<WebhookTriggerInput> {
       // Determine HTTP method
       const httpMethod = input.httpMethod || triggerInfo?.httpMethod || 'POST';
 
-      // SSRF protection - validate the webhook URL before making the request
-      const { SSRFProtection } = await import('../../utils/ssrf-protection');
-      const validation = await SSRFProtection.validateWebhookUrl(webhookUrl);
-      if (!validation.valid) {
-        return this.errorResponse(input, `SSRF protection: ${validation.reason}`, startTime);
-      }
+      // SSRF validation and DNS pinning are now handled internally by client.triggerWebhook
+      // This prevents race conditions and redundant DNS lookups
+      // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (CRITICAL-01)
 
       // Build webhook request
       const webhookRequest: WebhookRequest = {

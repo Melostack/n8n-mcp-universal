@@ -122,6 +122,8 @@ describe('SSRFProtection', () => {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
         expect(result.reason).toBeUndefined();
+        expect(result.resolvedIP).toBeDefined();
+        expect(result.family).toBeDefined();
       }
     });
 
@@ -155,6 +157,7 @@ describe('SSRFProtection', () => {
       for (const url of localhostURLs) {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
+        expect(result.resolvedIP).toBeDefined();
       }
     });
 
@@ -188,6 +191,7 @@ describe('SSRFProtection', () => {
     it('should allow public URLs', async () => {
       const result = await SSRFProtection.validateWebhookUrl('https://api.example.com/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBeDefined();
     });
   });
 
@@ -199,6 +203,7 @@ describe('SSRFProtection', () => {
     it('should allow localhost', async () => {
       const result = await SSRFProtection.validateWebhookUrl('http://localhost:5678/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBeDefined();
     });
 
     it('should allow private IPs', async () => {
@@ -211,6 +216,7 @@ describe('SSRFProtection', () => {
       for (const url of privateIPs) {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
+        expect(result.resolvedIP).toBeDefined();
       }
     });
 
@@ -265,6 +271,7 @@ describe('SSRFProtection', () => {
 
       const result = await SSRFProtection.validateWebhookUrl('http://internal.company.com/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBe('192.168.1.100');
     });
 
     it('should block hostname resolving to cloud metadata (all modes)', async () => {
@@ -392,6 +399,36 @@ describe('SSRFProtection', () => {
     it('should handle URL with special characters safely', async () => {
       const result = await SSRFProtection.validateWebhookUrl('https://example.com/webhook?param=value&other=123');
       expect(result.valid).toBe(true);
+    });
+  });
+
+  describe('Axios Lookup Helper', () => {
+    it('should return a valid lookup function that pins to the provided IP', () => {
+      const ip = '1.2.3.4';
+      const family = 4;
+      const lookupFn = SSRFProtection.getAxiosLookup(ip, family);
+
+      const callback = vi.fn();
+
+      // Call the lookup function
+      lookupFn('any-hostname.com', {}, callback);
+
+      // Verify callback was called with pinned IP
+      expect(callback).toHaveBeenCalledWith(null, ip, family);
+    });
+
+    it('should handle IPv6 pinning', () => {
+      const ip = '2001:db8::1';
+      const family = 6;
+      const lookupFn = SSRFProtection.getAxiosLookup(ip, family);
+
+      const callback = vi.fn();
+
+      // Call the lookup function
+      lookupFn('ipv6.google.com', {}, callback);
+
+      // Verify callback was called with pinned IP
+      expect(callback).toHaveBeenCalledWith(null, ip, family);
     });
   });
 });
