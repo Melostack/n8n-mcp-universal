@@ -125,6 +125,7 @@ vi.mock('express', () => {
       mockHandlers.delete.push({ path, handlers });
       return mockExpressApp;
     }),
+    disable: vi.fn(),
     use: vi.fn((handler: any) => {
       mockHandlers.use.push(handler);
       return mockExpressApp;
