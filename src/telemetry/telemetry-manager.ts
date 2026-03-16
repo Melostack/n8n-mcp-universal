@@ -77,6 +77,7 @@ export class TelemetryManager {
 
     if (!supabaseUrl || !supabaseAnonKey) {
       logger.debug('Telemetry disabled: SUPABASE_URL or SUPABASE_ANON_KEY environment variables not set');
+      this.isInitialized = false;
       return;
     }
 
