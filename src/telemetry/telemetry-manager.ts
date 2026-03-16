@@ -8,7 +8,6 @@ import { TelemetryConfigManager } from './config-manager';
 import { TelemetryEventTracker } from './event-tracker';
 import { TelemetryBatchProcessor } from './batch-processor';
 import { TelemetryPerformanceMonitor } from './performance-monitor';
-import { TELEMETRY_BACKEND } from './telemetry-types';
 import { TelemetryError, TelemetryErrorType, TelemetryErrorAggregator } from './telemetry-error';
 import { logger } from '../utils/logger';
 
@@ -73,10 +72,13 @@ export class TelemetryManager {
       return;
     }
 
-    // Use hardcoded credentials for zero-configuration telemetry
-    // Environment variables can override for development/testing
-    const supabaseUrl = process.env.SUPABASE_URL || TELEMETRY_BACKEND.URL;
-    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || TELEMETRY_BACKEND.ANON_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      logger.debug('Telemetry disabled: SUPABASE_URL or SUPABASE_ANON_KEY environment variables not set');
+      return;
+    }
 
     try {
       this.supabase = createClient(supabaseUrl, supabaseAnonKey, {
