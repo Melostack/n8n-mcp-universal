@@ -31,6 +31,9 @@ on:
       - 'SECURITY.md'
       - 'CODE_OF_CONDUCT.md'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
   issues: write
@@ -41,6 +44,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15  # Increased from 10 to accommodate larger database with community nodes
+    env:
+      HAS_N8N_API_URL: ${{ secrets.N8N_API_URL != '' }}
     steps:
       - uses: actions/checkout@v4
       
@@ -69,6 +74,7 @@ jobs:
       
       # Run integration tests separately (with MSW setup)
       - name: Run integration tests
+        if: env.HAS_N8N_API_URL == 'true'
         run: npm run test:integration -- --reporter=default --reporter=junit
         env:
           CI: true
