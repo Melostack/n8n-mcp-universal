@@ -72,6 +72,7 @@ const mockHandlers: { [key: string]: any[] } = {
 vi.mock('express', () => {
   // Create Express app mock inside the factory
   const mockExpressApp = {
+    disable: vi.fn(() => mockExpressApp),
     get: vi.fn((path: string, ...handlers: any[]) => {
       mockHandlers.get.push({ path, handlers });
       return mockExpressApp;
