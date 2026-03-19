@@ -1,0 +1,4 @@
+## 2024-05-18 - [Hardcoded Telemetry Database Credentials]
+**Vulnerability:** The project contained hardcoded database credentials (URL and API key for Supabase) in `src/telemetry/telemetry-types.ts`, which were used as fallbacks if environment variables were missing.
+**Learning:** Hardcoding database credentials in open-source projects exposes them to unauthorized access, allowing attackers to potentially write false data to the telemetry database, abuse rate limits, or discover further vulnerabilities in the Supabase instance.
+**Prevention:** Always rely on environment variables for sensitive credentials. If credentials are not provided via environment variables, the feature (telemetry in this case) should degrade gracefully (e.g., disable itself) instead of falling back to hardcoded secrets.
