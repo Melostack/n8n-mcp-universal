@@ -148,6 +148,9 @@ export async function startFixedHTTPServer() {
   
   const app = express();
   
+  // Disable X-Powered-By header to prevent technology stack information leakage
+  app.disable('x-powered-by');
+
   // Configure trust proxy for correct IP logging behind reverse proxies
   const trustProxy = process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : 0;
   if (trustProxy > 0) {
@@ -159,6 +162,7 @@ export async function startFixedHTTPServer() {
   
   // Security headers
   app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
