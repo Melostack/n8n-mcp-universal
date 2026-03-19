@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773355209803,
+  "lastUpdate": 1773886069984,
   "repoUrl": "https://github.com/Melostack/n8n-mcp-universal",
   "entries": {
     "n8n-mcp Benchmarks": [
@@ -209,6 +209,37 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Melostack/n8n-mcp-universal/commit/fee19dd9a63000bd603390c42c966a39146d9008"
         },
         "date": 1773355209086,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "sample - array sorting - small",
+            "value": 0.0136,
+            "range": "0.3096",
+            "unit": "ms",
+            "extra": "73341 ops/sec"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "backup.matheusmelo@gmail.com",
+            "name": "Matheus “Melostack” MeloX",
+            "username": "Melostack"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8970c87f5b169fae7f6c7608074162a9443cd192",
+          "message": "Merge pull request #25 from Melostack/sentinel-strict-security-headers-11505994845326507402\n\n🛡️ Sentinel: Add strict security headers",
+          "timestamp": "2026-03-18T23:05:34-03:00",
+          "tree_id": "e8412988af87d729c5726992771c0a50c653f832",
+          "url": "https://github.com/Melostack/n8n-mcp-universal/commit/8970c87f5b169fae7f6c7608074162a9443cd192"
+        },
+        "date": 1773886069510,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
