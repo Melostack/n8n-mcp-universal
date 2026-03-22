@@ -11,6 +11,7 @@
  * This implementation ensures the transport is properly initialized before handling requests.
  */
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { n8nDocumentationToolsFinal } from './mcp/tools';
 import { n8nManagementTools } from './mcp/tools-n8n-manager';
@@ -296,8 +297,37 @@ export async function startFixedHTTPServer() {
     });
   });
 
+  // SECURITY: Rate limiting for authentication endpoint
+  const authLimiter = rateLimit({
+    windowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW || '900000'), // 15 minutes
+    max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20'), // 20 authentication attempts per IP
+    message: {
+      jsonrpc: '2.0',
+      error: {
+        code: -32000,
+        message: 'Too many authentication attempts. Please try again later.'
+      }
+    },
+    standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+    legacyHeaders: false, // Disable `X-RateLimit-*` headers
+    handler: (req, res, next, options) => {
+      logger.warn('Rate limit exceeded', {
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        event: 'rate_limit'
+      });
+      res.status(options.statusCode).json({
+        jsonrpc: '2.0',
+        error: {
+          code: -32000,
+          message: 'Too many authentication attempts'
+        }
+      });
+    }
+  });
+
   // Main MCP endpoint - handle each request with custom transport handling
-  app.post('/mcp', async (req: express.Request, res: express.Response): Promise<void> => {
+  app.post('/mcp', authLimiter, async (req: express.Request, res: express.Response): Promise<void> => {
     const startTime = Date.now();
     
     // Enhanced authentication check with specific logging
