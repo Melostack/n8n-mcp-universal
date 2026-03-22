@@ -1,0 +1,4 @@
+## 2024-05-18 - [Add rate limiter to legacy MCP endpoint]
+**Vulnerability:** The legacy `/mcp` HTTP endpoint in `src/http-server.ts` lacked rate limiting, making it vulnerable to brute force attacks on the Authorization token. The new single-session HTTP server implemented this properly, but the legacy one was left unprotected.
+**Learning:** When multiple server modules exist handling the same endpoints (e.g., deprecated vs new), security patches and enhancements must be applied consistently across all active modules to avoid bypasses through legacy paths.
+**Prevention:** Audit all entry points for an application to ensure security middleware (like rate limiting) is applied uniformly, especially when maintaining older or deprecated API versions alongside new ones.
