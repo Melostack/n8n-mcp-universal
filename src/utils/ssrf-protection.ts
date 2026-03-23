@@ -70,9 +70,31 @@ export class SSRFProtection {
    * const result = await SSRFProtection.validateWebhookUrl('http://localhost:5678');
    * // { valid: true }
    */
+  /**
+   * Generates a custom DNS lookup function for Axios to prevent DNS rebinding attacks.
+   * This pins the IP address to the one validated by validateWebhookUrl.
+   *
+   * @param resolvedIP The validated IP address
+   * @param family The IP family (4 or 6)
+   * @returns A lookup function compatible with Axios/Node.js http module
+   */
+  static getAxiosLookup(resolvedIP: string, family: number) {
+    return (
+      hostname: string,
+      options: any,
+      callback: (err: NodeJS.ErrnoException | null, address: string, family: 4 | 6) => void
+    ) => {
+      // Regardless of what hostname Axios asks for, return our pre-validated IP
+      logger.debug('DNS pinning applied', { hostname, pinnedIP: resolvedIP });
+      callback(null, resolvedIP, family as 4 | 6);
+    };
+  }
+
   static async validateWebhookUrl(urlString: string): Promise<{
     valid: boolean;
-    reason?: string
+    reason?: string;
+    resolvedIP?: string;
+    family?: number;
   }> {
     try {
       const url = new URL(urlString);
@@ -99,9 +121,11 @@ export class SSRFProtection {
       // Step 3: Resolve DNS to get actual IP address
       // This prevents DNS rebinding attacks where hostname resolves to different IPs
       let resolvedIP: string;
+      let resolvedFamily: number;
       try {
-        const { address } = await lookup(hostname);
+        const { address, family } = await lookup(hostname);
         resolvedIP = address;
+        resolvedFamily = family;
 
         logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, mode });
       } catch (error) {
@@ -130,7 +154,7 @@ export class SSRFProtection {
           hostname,
           resolvedIP
         });
-        return { valid: true };
+        return { valid: true, resolvedIP, family: resolvedFamily };
       }
 
       // Check if target is localhost
@@ -150,7 +174,7 @@ export class SSRFProtection {
       // MODE: moderate - Allow localhost, block private IPs
       if (mode === 'moderate' && isLocalhost) {
         logger.info('Localhost webhook allowed (moderate mode)', { hostname, resolvedIP });
-        return { valid: true };
+        return { valid: true, resolvedIP, family: resolvedFamily };
       }
 
       // Step 6: Check private IPv4 ranges (strict & moderate modes)
@@ -179,7 +203,7 @@ export class SSRFProtection {
         return { valid: false, reason: 'IPv6 private address not allowed' };
       }
 
-      return { valid: true };
+      return { valid: true, resolvedIP, family: resolvedFamily };
     } catch (error) {
       return { valid: false, reason: 'Invalid URL format' };
     }
