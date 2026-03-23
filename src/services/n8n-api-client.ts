@@ -365,6 +365,10 @@ export class N8nApiClient {
         params: httpMethod === 'GET' ? data : undefined,
         // Webhooks might take longer
         timeout: waitForResponse ? 120000 : 30000,
+        // Apply DNS pinning to prevent DNS rebinding
+        lookup: validation.resolvedIP && validation.family
+          ? SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family)
+          : undefined,
       };
 
       // Create a new axios instance for webhook requests to avoid API interceptors

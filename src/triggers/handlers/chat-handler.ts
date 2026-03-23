@@ -107,6 +107,10 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
         data: chatPayload,
         timeout: input.timeout || (input.waitForResponse !== false ? 120000 : 30000),
         validateStatus: (status) => status < 500,
+        // Apply DNS pinning to prevent DNS rebinding
+        lookup: validation.resolvedIP && validation.family
+          ? SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family)
+          : undefined,
       };
 
       // Make the request (sync mode - no streaming)
