@@ -147,6 +147,7 @@ export async function startFixedHTTPServer() {
   validateEnvironment();
   
   const app = express();
+  app.disable('x-powered-by');
   
   // Disable X-Powered-By header to prevent technology stack information leakage
   app.disable('x-powered-by');
@@ -167,6 +168,7 @@ export async function startFixedHTTPServer() {
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
     next();
   });
   
