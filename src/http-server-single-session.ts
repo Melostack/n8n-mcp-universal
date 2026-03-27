@@ -790,6 +790,7 @@ export class SingleSessionHTTPServer {
    */
   async start(): Promise<void> {
     const app = express();
+    app.disable('x-powered-by');
     
     // Create JSON parser middleware for endpoints that need it
     const jsonParser = express.json({ limit: '10mb' });

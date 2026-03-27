@@ -79,7 +79,8 @@ const mockExpressApp = {
     if (callback) callback();
     return mockServer;
   }),
-  set: vi.fn()
+  set: vi.fn(),
+  disable: vi.fn()
 };
 
 vi.mock('express', () => {

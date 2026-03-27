@@ -147,6 +147,7 @@ export async function startFixedHTTPServer() {
   validateEnvironment();
   
   const app = express();
+  app.disable('x-powered-by');
   
   // Disable X-Powered-By header to prevent technology stack information leakage
   app.disable('x-powered-by');

@@ -92,6 +92,7 @@ vi.mock('express', () => {
       return mockExpressApp;
     }),
     set: vi.fn(),
+    disable: vi.fn(),
     listen: vi.fn((port: number, host: string, callback?: () => void) => {
       if (callback) callback();
       return {
