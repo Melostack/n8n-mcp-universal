@@ -33,7 +33,11 @@ describe('TelemetryManager', () => {
   let mockBatchProcessor: any;
   let manager: TelemetryManager;
 
+
   beforeEach(() => {
+    process.env.SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+
     // Reset singleton using the new method
     TelemetryManager.resetInstance();
 
@@ -110,7 +114,11 @@ describe('TelemetryManager', () => {
     vi.clearAllMocks();
   });
 
+
   afterEach(() => {
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_ANON_KEY;
+
     // Clean up global state
     TelemetryManager.resetInstance();
   });
@@ -147,8 +155,8 @@ describe('TelemetryManager', () => {
 
       expect(mockConfigManager.isEnabled).toHaveBeenCalled();
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_ANON_KEY || '',
         expect.objectContaining({
           auth: {
             persistSession: false,
@@ -603,8 +611,8 @@ describe('TelemetryManager', () => {
 
     it('should configure Supabase client with correct options', () => {
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_ANON_KEY || '',
         {
           auth: {
             persistSession: false,

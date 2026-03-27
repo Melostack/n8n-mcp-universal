@@ -78,6 +78,11 @@ export class TelemetryManager {
     const supabaseUrl = process.env.SUPABASE_URL || TELEMETRY_BACKEND.URL;
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || TELEMETRY_BACKEND.ANON_KEY;
 
+    if (!supabaseUrl || !supabaseAnonKey) {
+      logger.debug('Telemetry backend not configured, telemetry disabled');
+      return;
+    }
+
     try {
       this.supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
