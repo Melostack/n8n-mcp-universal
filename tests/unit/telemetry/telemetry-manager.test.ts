@@ -4,7 +4,7 @@ import { TelemetryConfigManager } from '../../../src/telemetry/config-manager';
 import { TelemetryEventTracker } from '../../../src/telemetry/event-tracker';
 import { TelemetryBatchProcessor } from '../../../src/telemetry/batch-processor';
 import { createClient } from '@supabase/supabase-js';
-import { TELEMETRY_BACKEND } from '../../../src/telemetry/telemetry-types';
+
 import { TelemetryError, TelemetryErrorType } from '../../../src/telemetry/telemetry-error';
 
 // Mock all dependencies
@@ -138,6 +138,8 @@ describe('TelemetryManager', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -147,8 +149,8 @@ describe('TelemetryManager', () => {
 
       expect(mockConfigManager.isEnabled).toHaveBeenCalled();
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://test-supabase-url.com',
+        'test-anon-key',
         expect.objectContaining({
           auth: {
             persistSession: false,
@@ -207,6 +209,8 @@ describe('TelemetryManager', () => {
 
   describe('event tracking methods', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -316,6 +320,8 @@ describe('TelemetryManager', () => {
 
   describe('flush()', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -389,6 +395,8 @@ describe('TelemetryManager', () => {
 
   describe('enable/disable functionality', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -422,6 +430,8 @@ describe('TelemetryManager', () => {
 
   describe('getMetrics()', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
       // Trigger initialization for enabled tests
       manager.trackEvent('test', {});
@@ -474,6 +484,8 @@ describe('TelemetryManager', () => {
 
   describe('error handling and aggregation', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -530,6 +542,8 @@ describe('TelemetryManager', () => {
 
   describe('isEnabled() privacy', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
@@ -558,6 +572,11 @@ describe('TelemetryManager', () => {
   });
 
   describe('dependency injection and callbacks', () => {
+    beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+    });
+
     it('should provide correct callbacks to EventTracker', () => {
       const TelemetryEventTrackerMock = vi.mocked(TelemetryEventTracker);
 
@@ -596,6 +615,8 @@ describe('TelemetryManager', () => {
 
   describe('Supabase client configuration', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
       // Trigger initialization
       manager.trackEvent('test', {});
@@ -603,8 +624,8 @@ describe('TelemetryManager', () => {
 
     it('should configure Supabase client with correct options', () => {
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://test-supabase-url.com',
+        'test-anon-key',
         {
           auth: {
             persistSession: false,
@@ -622,6 +643,8 @@ describe('TelemetryManager', () => {
 
   describe('workflow creation auto-flush behavior', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+      process.env.SUPABASE_ANON_KEY = 'test-anon-key';
       manager = TelemetryManager.getInstance();
     });
 
