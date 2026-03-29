@@ -72,7 +72,9 @@ export class SSRFProtection {
    */
   static async validateWebhookUrl(urlString: string): Promise<{
     valid: boolean;
-    reason?: string
+    reason?: string;
+    resolvedIP?: string;
+    family?: number;
   }> {
     try {
       const url = new URL(urlString);
@@ -99,11 +101,14 @@ export class SSRFProtection {
       // Step 3: Resolve DNS to get actual IP address
       // This prevents DNS rebinding attacks where hostname resolves to different IPs
       let resolvedIP: string;
+      let family: number;
       try {
-        const { address } = await lookup(hostname);
-        resolvedIP = address;
+        // Capture both address and family for proper connection handling
+        const result = await lookup(hostname);
+        resolvedIP = result.address;
+        family = result.family;
 
-        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, mode });
+        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, family, mode });
       } catch (error) {
         logger.warn('DNS resolution failed for webhook URL', {
           hostname,
@@ -130,7 +135,7 @@ export class SSRFProtection {
           hostname,
           resolvedIP
         });
-        return { valid: true };
+        return { valid: true, resolvedIP, family };
       }
 
       // Check if target is localhost
@@ -150,7 +155,7 @@ export class SSRFProtection {
       // MODE: moderate - Allow localhost, block private IPs
       if (mode === 'moderate' && isLocalhost) {
         logger.info('Localhost webhook allowed (moderate mode)', { hostname, resolvedIP });
-        return { valid: true };
+        return { valid: true, resolvedIP, family };
       }
 
       // Step 6: Check private IPv4 ranges (strict & moderate modes)
@@ -179,7 +184,7 @@ export class SSRFProtection {
         return { valid: false, reason: 'IPv6 private address not allowed' };
       }
 
-      return { valid: true };
+      return { valid: true, resolvedIP, family };
     } catch (error) {
       return { valid: false, reason: 'Invalid URL format' };
     }

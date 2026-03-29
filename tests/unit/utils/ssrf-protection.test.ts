@@ -122,6 +122,8 @@ describe('SSRFProtection', () => {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
         expect(result.reason).toBeUndefined();
+        expect(result.resolvedIP).toBe('8.8.8.8');
+        expect(result.family).toBe(4);
       }
     });
 
@@ -155,6 +157,8 @@ describe('SSRFProtection', () => {
       for (const url of localhostURLs) {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
+        expect(result.resolvedIP).toBeDefined();
+        expect(result.family).toBeDefined();
       }
     });
 
@@ -188,6 +192,7 @@ describe('SSRFProtection', () => {
     it('should allow public URLs', async () => {
       const result = await SSRFProtection.validateWebhookUrl('https://api.example.com/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBeDefined();
     });
   });
 
@@ -199,6 +204,7 @@ describe('SSRFProtection', () => {
     it('should allow localhost', async () => {
       const result = await SSRFProtection.validateWebhookUrl('http://localhost:5678/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBeDefined();
     });
 
     it('should allow private IPs', async () => {
@@ -211,6 +217,7 @@ describe('SSRFProtection', () => {
       for (const url of privateIPs) {
         const result = await SSRFProtection.validateWebhookUrl(url);
         expect(result.valid).toBe(true);
+        expect(result.resolvedIP).toBeDefined();
       }
     });
 
@@ -231,6 +238,7 @@ describe('SSRFProtection', () => {
     it('should allow public URLs', async () => {
       const result = await SSRFProtection.validateWebhookUrl('https://api.example.com/webhook');
       expect(result.valid).toBe(true);
+      expect(result.resolvedIP).toBeDefined();
     });
   });
 
