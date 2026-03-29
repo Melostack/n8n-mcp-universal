@@ -1,0 +1,4 @@
+## 2024-05-18 - [Missing Rate Limiting in Legacy HTTP Server Endpoint]
+**Vulnerability:** The deprecated legacy HTTP server (`src/http-server.ts`) handled the `/mcp` POST endpoint without any rate-limiting, missing brute-force and DoS protection that was explicitly implemented in the active server (`src/http-server-single-session.ts`).
+**Learning:** Even though an endpoint or file might be marked `@deprecated` or legacy, if it is still exposed and accessible, it must receive symmetrical security patches. Attackers will actively seek out unmaintained legacy endpoints to bypass new security measures (e.g. rate-limiting auth endpoints).
+**Prevention:** Always search for all references or alternate paths matching the route/functionality when applying a security fix, and ensure identical protections are applied across the board, or remove the legacy functionality entirely.
