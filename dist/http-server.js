@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadAuthToken = loadAuthToken;
 exports.startFixedHTTPServer = startFixedHTTPServer;
 const express_1 = __importDefault(require("express"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const tools_1 = require("./mcp/tools");
 const tools_n8n_manager_1 = require("./mcp/tools-n8n-manager");
 const server_1 = require("./mcp/server");
@@ -90,12 +91,14 @@ async function startFixedHTTPServer() {
         'See: https://github.com/czlonkowski/n8n-mcp/issues/524');
     validateEnvironment();
     const app = (0, express_1.default)();
+    app.disable('x-powered-by');
     const trustProxy = process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : 0;
     if (trustProxy > 0) {
         app.set('trust proxy', trustProxy);
         logger_1.logger.info(`Trust proxy enabled with ${trustProxy} hop(s)`);
     }
     app.use((req, res, next) => {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');
         res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -211,7 +214,36 @@ async function startFixedHTTPServer() {
             documentation: 'https://github.com/czlonkowski/n8n-mcp'
         });
     });
-    app.post('/mcp', async (req, res) => {
+    const authLimiter = (0, express_rate_limit_1.default)({
+        windowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW || '900000'),
+        max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20'),
+        message: {
+            jsonrpc: '2.0',
+            error: {
+                code: -32000,
+                message: 'Too many authentication attempts. Please try again later.'
+            },
+            id: null
+        },
+        standardHeaders: true,
+        legacyHeaders: false,
+        handler: (req, res) => {
+            logger_1.logger.warn('Rate limit exceeded', {
+                ip: req.ip,
+                userAgent: req.get('user-agent'),
+                path: req.path
+            });
+            res.status(429).json({
+                jsonrpc: '2.0',
+                error: {
+                    code: -32000,
+                    message: 'Too many authentication attempts. Please try again later.'
+                },
+                id: null
+            });
+        }
+    });
+    app.post('/mcp', authLimiter, async (req, res) => {
         const startTime = Date.now();
         const authHeader = req.headers.authorization;
         if (!authHeader) {
@@ -268,10 +300,29 @@ async function startFixedHTTPServer() {
         }
         try {
             let body = '';
+            let bodySize = 0;
+            const MAX_BODY_SIZE = 10 * 1024 * 1024;
             req.on('data', chunk => {
+                bodySize += chunk.length;
+                if (bodySize > MAX_BODY_SIZE) {
+                    req.destroy();
+                    if (!res.headersSent) {
+                        res.status(413).json({
+                            jsonrpc: '2.0',
+                            error: {
+                                code: -32602,
+                                message: 'Payload Too Large: Body size exceeds 10MB limit'
+                            },
+                            id: null
+                        });
+                    }
+                    return;
+                }
                 body += chunk.toString();
             });
             req.on('end', async () => {
+                if (bodySize > MAX_BODY_SIZE)
+                    return;
                 try {
                     const jsonRpcRequest = JSON.parse(body);
                     logger_1.logger.debug('Received JSON-RPC request:', { method: jsonRpcRequest.method });
