@@ -38,6 +38,15 @@ export function getTestN8nClient(): N8nApiClient {
 }
 
 /**
+ * Run integration tests conditionally based on API availability.
+ * This prevents CI failures on PRs where secrets (like N8N_API_URL)
+ * are not available and it falls back to an unreachable default.
+ */
+export const describeIfApiAccessible = process.env.N8N_API_URL &&
+  process.env.N8N_API_URL !== 'http://localhost:3001/mock-api' ?
+  describe : describe.skip;
+
+/**
  * Reset the test client instance
  *
  * Forces recreation of the client on next call to getTestN8nClient().

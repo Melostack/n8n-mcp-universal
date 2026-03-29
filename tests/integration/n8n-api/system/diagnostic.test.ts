@@ -11,7 +11,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleDiagnostic } from '../../../../src/mcp/handlers-n8n-manager';
 import { DiagnosticResponse } from '../utils/response-types';
 
-describe('Integration: handleDiagnostic', () => {
+describeIfApiAccessible('Integration: handleDiagnostic', () => {
   let mcpContext: InstanceContext;
 
   beforeEach(() => {
@@ -22,7 +22,7 @@ describe('Integration: handleDiagnostic', () => {
   // Basic Diagnostic
   // ======================================================================
 
-  describe('Basic Diagnostic', () => {
+  describeIfApiAccessible('Basic Diagnostic', () => {
     it('should run basic diagnostic check', async () => {
       const response = await handleDiagnostic(
         { params: { arguments: {} } },
@@ -201,7 +201,7 @@ describe('Integration: handleDiagnostic', () => {
   // Environment Detection
   // ======================================================================
 
-  describe('Environment Detection', () => {
+  describeIfApiAccessible('Environment Detection', () => {
     it('should provide mode-specific debugging suggestions', async () => {
       const response = await handleDiagnostic(
         { params: { arguments: {} } },
@@ -291,7 +291,7 @@ describe('Integration: handleDiagnostic', () => {
   // Verbose Mode
   // ======================================================================
 
-  describe('Verbose Mode', () => {
+  describeIfApiAccessible('Verbose Mode', () => {
     it('should include additional debug info in verbose mode', async () => {
       const response = await handleDiagnostic(
         { params: { arguments: { verbose: true } } },
@@ -359,7 +359,7 @@ describe('Integration: handleDiagnostic', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete diagnostic response structure', async () => {
       const response = await handleDiagnostic(
         { params: { arguments: {} } },

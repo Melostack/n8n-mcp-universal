@@ -15,6 +15,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -25,7 +26,7 @@ import { NodeRepository } from '../../../../src/database/node-repository';
 import { handleUpdatePartialWorkflow } from '../../../../src/mcp/handlers-workflow-diff';
 import { Workflow } from '../../../../src/types/n8n-api';
 
-describe('Integration: Smart Parameters with Real n8n API', () => {
+describeIfApiAccessible('Integration: Smart Parameters with Real n8n API', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -56,7 +57,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // TEST 1: IF node with branch='true'
   // ======================================================================
 
-  describe('IF Node Smart Parameters', () => {
+  describeIfApiAccessible('IF Node Smart Parameters', () => {
     it('should handle branch="true" with real n8n API', async () => {
       // Create minimal workflow with IF node
       const workflowName = createTestWorkflowName('Smart Params - IF True Branch');
@@ -406,7 +407,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // TEST 4-6: Switch node with case parameter
   // ======================================================================
 
-  describe('Switch Node Smart Parameters', () => {
+  describeIfApiAccessible('Switch Node Smart Parameters', () => {
     it('should handle case=0, case=1, case=2 with real n8n API', async () => {
       // Create minimal workflow with Switch node
       const workflowName = createTestWorkflowName('Smart Params - Switch Cases');
@@ -614,7 +615,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // TEST 5: rewireConnection with branch parameter
   // ======================================================================
 
-  describe('RewireConnection with Smart Parameters', () => {
+  describeIfApiAccessible('RewireConnection with Smart Parameters', () => {
     it('should rewire connection using branch="true" parameter', async () => {
       // Create workflow with IF node and initial connection
       const workflowName = createTestWorkflowName('Smart Params - Rewire IF True');
@@ -885,7 +886,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // TEST 7: Explicit sourceIndex overrides branch
   // ======================================================================
 
-  describe('Parameter Priority', () => {
+  describeIfApiAccessible('Parameter Priority', () => {
     it('should prioritize explicit sourceIndex over branch parameter', async () => {
       // Create minimal workflow with IF node
       const workflowName = createTestWorkflowName('Smart Params - Explicit Override Branch');
@@ -1122,7 +1123,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // ERROR CASES: Invalid smart parameter values
   // ======================================================================
 
-  describe('Error Cases', () => {
+  describeIfApiAccessible('Error Cases', () => {
     it('should reject invalid branch value', async () => {
       // Create minimal workflow with IF node
       const workflowName = createTestWorkflowName('Smart Params - Invalid Branch');
@@ -1291,7 +1292,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // EDGE CASES: Branch parameter on non-IF node
   // ======================================================================
 
-  describe('Edge Cases', () => {
+  describeIfApiAccessible('Edge Cases', () => {
     it('should ignore branch parameter on non-IF node (fallback to default)', async () => {
       // Create workflow with Set node (not an IF node)
       const workflowName = createTestWorkflowName('Smart Params - Branch on Non-IF');
@@ -1380,7 +1381,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // ======================================================================
   // TEST 11: Array Index Preservation (Issue #272 - Critical Bug Fix)
   // ======================================================================
-  describe('Array Index Preservation for Multi-Output Nodes', () => {
+  describeIfApiAccessible('Array Index Preservation for Multi-Output Nodes', () => {
     it('should preserve array indices when rewiring Switch node connections', async () => {
       // This test verifies the fix for the critical bug where filtering empty arrays
       // caused index shifting in multi-output nodes (Switch, IF with multiple handlers)
@@ -1993,7 +1994,7 @@ describe('Integration: Smart Parameters with Real n8n API', () => {
   // ======================================================================
   // TEST 16-19: Merge Node - Multiple Inputs (targetIndex preservation)
   // ======================================================================
-  describe('Merge Node - Multiple Inputs (targetIndex Preservation)', () => {
+  describeIfApiAccessible('Merge Node - Multiple Inputs (targetIndex Preservation)', () => {
     it('should preserve targetIndex when removing connection to Merge input 0', async () => {
       // CRITICAL: Merge has multiple INPUTS (unlike Switch which has multiple outputs)
       // This tests that targetIndex preservation works for incoming connections

@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -25,7 +26,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleCreateWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleCreateWorkflow', () => {
+describeIfApiAccessible('Integration: handleCreateWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -53,7 +54,7 @@ describe('Integration: handleCreateWorkflow', () => {
   // P0: Critical Bug Verification
   // ======================================================================
 
-  describe('P0: Node Type Format Bug Fix', () => {
+  describeIfApiAccessible('P0: Node Type Format Bug Fix', () => {
     it('should create workflow with webhook node using FULL node type format', async () => {
       // This test verifies the P0 bug fix where SHORT node type format
       // (e.g., "webhook") was incorrectly normalized to FULL format
@@ -96,7 +97,7 @@ describe('Integration: handleCreateWorkflow', () => {
   // P1: Base Nodes (High Priority)
   // ======================================================================
 
-  describe('P1: Base n8n Nodes', () => {
+  describeIfApiAccessible('P1: Base n8n Nodes', () => {
     it('should create workflow with HTTP Request node', async () => {
       const workflowName = createTestWorkflowName('HTTP Request Node');
       const workflow = {
@@ -202,7 +203,7 @@ describe('Integration: handleCreateWorkflow', () => {
   // P2: Advanced Features (Medium Priority)
   // ======================================================================
 
-  describe('P2: Advanced Workflow Features', () => {
+  describeIfApiAccessible('P2: Advanced Workflow Features', () => {
     it('should create workflow with complex connections and branching', async () => {
       const workflowName = createTestWorkflowName('Complex Connections');
       const workflow = {
@@ -342,7 +343,7 @@ describe('Integration: handleCreateWorkflow', () => {
   // Error Scenarios (P1 Priority)
   // ======================================================================
 
-  describe('Error Scenarios', () => {
+  describeIfApiAccessible('Error Scenarios', () => {
     it('should reject workflow with invalid node type (MCP validation)', async () => {
       // MCP handler correctly validates workflows before sending to n8n API.
       // Invalid node types are caught during MCP validation.
@@ -492,7 +493,7 @@ describe('Integration: handleCreateWorkflow', () => {
   // Additional Edge Cases
   // ======================================================================
 
-  describe('Edge Cases', () => {
+  describeIfApiAccessible('Edge Cases', () => {
     it('should reject single-node non-webhook workflow (MCP validation)', async () => {
       // MCP handler enforces that single-node workflows are only valid for webhooks.
       // This is a best practice validation.

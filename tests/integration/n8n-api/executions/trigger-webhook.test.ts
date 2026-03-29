@@ -11,7 +11,7 @@ import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleTriggerWebhookWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 import { getN8nCredentials } from '../utils/credentials';
 
-describe('Integration: handleTriggerWebhookWorkflow', () => {
+describeIfApiAccessible('Integration: handleTriggerWebhookWorkflow', () => {
   let mcpContext: InstanceContext;
   let webhookUrls: {
     get: string;
@@ -30,7 +30,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // GET Method Tests
   // ======================================================================
 
-  describe('GET Method', () => {
+  describeIfApiAccessible('GET Method', () => {
     it('should trigger GET webhook without data', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {
@@ -98,7 +98,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // POST Method Tests
   // ======================================================================
 
-  describe('POST Method', () => {
+  describeIfApiAccessible('POST Method', () => {
     it('should trigger POST webhook with JSON data', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {
@@ -170,7 +170,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // PUT Method Tests
   // ======================================================================
 
-  describe('PUT Method', () => {
+  describeIfApiAccessible('PUT Method', () => {
     it('should trigger PUT webhook with update data', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {
@@ -225,7 +225,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // DELETE Method Tests
   // ======================================================================
 
-  describe('DELETE Method', () => {
+  describeIfApiAccessible('DELETE Method', () => {
     it('should trigger DELETE webhook with query parameters', async () => {
       const urlWithParams = `${webhookUrls.delete}?id=123&reason=test`;
 
@@ -276,7 +276,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should handle invalid webhook URL', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {
@@ -333,7 +333,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // Default Method (POST)
   // ======================================================================
 
-  describe('Default Method Behavior', () => {
+  describeIfApiAccessible('Default Method Behavior', () => {
     it('should default to POST method when not specified', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {
@@ -352,7 +352,7 @@ describe('Integration: handleTriggerWebhookWorkflow', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete webhook response structure', async () => {
       const response = await handleTriggerWebhookWorkflow(
         {

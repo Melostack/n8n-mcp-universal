@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -15,7 +17,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleGetWorkflowDetails } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleGetWorkflowDetails', () => {
+describeIfApiAccessible('Integration: handleGetWorkflowDetails', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -40,7 +42,7 @@ describe('Integration: handleGetWorkflowDetails', () => {
   // Basic Workflow Details
   // ======================================================================
 
-  describe('Basic Workflow', () => {
+  describeIfApiAccessible('Basic Workflow', () => {
     it('should retrieve workflow with basic details', async () => {
       // Create a simple workflow
       const workflow = {
@@ -83,7 +85,7 @@ describe('Integration: handleGetWorkflowDetails', () => {
   // Workflow with Metadata
   // ======================================================================
 
-  describe('Workflow with Metadata', () => {
+  describeIfApiAccessible('Workflow with Metadata', () => {
     it('should retrieve workflow with tags and settings metadata', async () => {
       // Create workflow with rich metadata
       const workflow = {
@@ -130,7 +132,7 @@ describe('Integration: handleGetWorkflowDetails', () => {
   // Version History
   // ======================================================================
 
-  describe('Version History', () => {
+  describeIfApiAccessible('Version History', () => {
     // TODO: Investigate versionId behavior change in n8n 2.0
     // versionId may not change on simple name updates anymore
     it.skip('should track version changes after updates', async () => {
@@ -180,7 +182,7 @@ describe('Integration: handleGetWorkflowDetails', () => {
   // Execution Statistics
   // ======================================================================
 
-  describe('Execution Statistics', () => {
+  describeIfApiAccessible('Execution Statistics', () => {
     it('should include execution-related fields in details', async () => {
       // Create workflow
       const workflow = {

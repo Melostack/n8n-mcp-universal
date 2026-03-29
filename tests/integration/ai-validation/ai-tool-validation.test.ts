@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../n8n-api/utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../n8n-api/utils/test-context';
 import { getTestN8nClient } from '../n8n-api/utils/n8n-client';
 import { N8nApiClient } from '../../../src/services/n8n-api-client';
@@ -25,7 +26,7 @@ import {
   createAIWorkflow
 } from './helpers';
 
-describe('Integration: AI Tool Validation', () => {
+describeIfApiAccessible('Integration: AI Tool Validation', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -53,7 +54,7 @@ describe('Integration: AI Tool Validation', () => {
   // HTTP Request Tool Tests
   // ======================================================================
 
-  describe('HTTP Request Tool', () => {
+  describeIfApiAccessible('HTTP Request Tool', () => {
     it('should detect missing toolDescription', async () => {
       const httpTool = createHTTPRequestToolNode({
         name: 'HTTP Request Tool',
@@ -164,7 +165,7 @@ describe('Integration: AI Tool Validation', () => {
   // Code Tool Tests
   // ======================================================================
 
-  describe('Code Tool', () => {
+  describeIfApiAccessible('Code Tool', () => {
     it('should detect missing code', async () => {
       const codeTool = createCodeToolNode({
         name: 'Code Tool',
@@ -237,7 +238,7 @@ describe('Integration: AI Tool Validation', () => {
   // Vector Store Tool Tests
   // ======================================================================
 
-  describe('Vector Store Tool', () => {
+  describeIfApiAccessible('Vector Store Tool', () => {
     it('should detect missing toolDescription', async () => {
       const vectorTool = createVectorStoreToolNode({
         name: 'Vector Store Tool',
@@ -308,7 +309,7 @@ describe('Integration: AI Tool Validation', () => {
   // Workflow Tool Tests
   // ======================================================================
 
-  describe('Workflow Tool', () => {
+  describeIfApiAccessible('Workflow Tool', () => {
     it('should detect missing workflowId', async () => {
       const workflowTool = createWorkflowToolNode({
         name: 'Workflow Tool',
@@ -381,7 +382,7 @@ describe('Integration: AI Tool Validation', () => {
   // Calculator Tool Tests
   // ======================================================================
 
-  describe('Calculator Tool', () => {
+  describeIfApiAccessible('Calculator Tool', () => {
     it('should validate Calculator Tool (no configuration needed)', async () => {
       const calcTool = createCalculatorToolNode({
         name: 'Calculator'

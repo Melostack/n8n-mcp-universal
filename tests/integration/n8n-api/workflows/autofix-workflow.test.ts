@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -17,7 +18,7 @@ import { getNodeRepository, closeNodeRepository } from '../utils/node-repository
 import { NodeRepository } from '../../../../src/database/node-repository';
 import { AutofixResponse } from '../types/mcp-responses';
 
-describe('Integration: handleAutofixWorkflow', () => {
+describeIfApiAccessible('Integration: handleAutofixWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -45,7 +46,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Preview Mode (applyFixes: false)
   // ======================================================================
 
-  describe('Preview Mode', () => {
+  describeIfApiAccessible('Preview Mode', () => {
     it('should preview fixes without applying them (expression-format)', async () => {
       // Create workflow with expression format issues
       const workflow = {
@@ -172,7 +173,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Apply Mode (applyFixes: true)
   // ======================================================================
 
-  describe('Apply Mode', () => {
+  describeIfApiAccessible('Apply Mode', () => {
     it('should apply expression-format fixes', async () => {
       const workflow = {
         name: createTestWorkflowName('Autofix - Apply Expression'),
@@ -301,7 +302,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Fix Type Filtering
   // ======================================================================
 
-  describe('Fix Type Filtering', () => {
+  describeIfApiAccessible('Fix Type Filtering', () => {
     it('should only apply specified fix types', async () => {
       const workflow = {
         name: createTestWorkflowName('Autofix - Filter Fix Types'),
@@ -390,7 +391,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Confidence Threshold
   // ======================================================================
 
-  describe('Confidence Threshold', () => {
+  describeIfApiAccessible('Confidence Threshold', () => {
     it('should filter fixes by high confidence threshold', async () => {
       const workflow = {
         name: createTestWorkflowName('Autofix - High Confidence'),
@@ -523,7 +524,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Max Fixes Parameter
   // ======================================================================
 
-  describe('Max Fixes Parameter', () => {
+  describeIfApiAccessible('Max Fixes Parameter', () => {
     it('should limit fixes to maxFixes parameter', async () => {
       // Create workflow with multiple issues
       const workflow = {
@@ -594,7 +595,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // No Fixes Available
   // ======================================================================
 
-  describe('No Fixes Available', () => {
+  describeIfApiAccessible('No Fixes Available', () => {
     it('should handle workflow with no fixable issues', async () => {
       // Create valid workflow
       const workflow = {
@@ -643,7 +644,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should handle non-existent workflow ID', async () => {
       const response = await handleAutofixWorkflow(
         {
@@ -738,7 +739,7 @@ describe('Integration: handleAutofixWorkflow', () => {
   // Response Format Verification
   // ======================================================================
 
-  describe('Response Format', () => {
+  describeIfApiAccessible('Response Format', () => {
     it('should return complete autofix response structure (preview)', async () => {
       const workflow = {
         name: createTestWorkflowName('Autofix - Response Format Preview'),

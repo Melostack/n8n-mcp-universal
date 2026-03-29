@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../n8n-api/utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../n8n-api/utils/test-context';
 import { getTestN8nClient } from '../n8n-api/utils/n8n-client';
 import { N8nApiClient } from '../../../src/services/n8n-api-client';
@@ -30,7 +31,7 @@ import {
   createAIWorkflow
 } from './helpers';
 
-describe('Integration: AI Agent Validation', () => {
+describeIfApiAccessible('Integration: AI Agent Validation', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;

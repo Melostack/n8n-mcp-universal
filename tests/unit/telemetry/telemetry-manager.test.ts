@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach, beforeAll, afterAll } from 'vitest';
 import { TelemetryManager, telemetry } from '../../../src/telemetry/telemetry-manager';
 import { TelemetryConfigManager } from '../../../src/telemetry/config-manager';
 import { TelemetryEventTracker } from '../../../src/telemetry/event-tracker';
 import { TelemetryBatchProcessor } from '../../../src/telemetry/batch-processor';
 import { createClient } from '@supabase/supabase-js';
-import { TELEMETRY_BACKEND } from '../../../src/telemetry/telemetry-types';
+
 import { TelemetryError, TelemetryErrorType } from '../../../src/telemetry/telemetry-error';
 
 // Mock all dependencies
@@ -32,6 +32,12 @@ describe('TelemetryManager', () => {
   let mockEventTracker: any;
   let mockBatchProcessor: any;
   let manager: TelemetryManager;
+
+  const originalEnv = process.env;
+
+  beforeAll(() => {
+    process.env = { ...originalEnv };
+  });
 
   beforeEach(() => {
     // Reset singleton using the new method
@@ -108,11 +114,19 @@ describe('TelemetryManager', () => {
     vi.mocked(TelemetryBatchProcessor).mockImplementation(() => mockBatchProcessor);
 
     vi.clearAllMocks();
+
+    process.env.SUPABASE_URL = 'https://test-supabase-url.com';
+    process.env.SUPABASE_ANON_KEY = 'test-supabase-anon-key';
   });
 
   afterEach(() => {
     // Clean up global state
     TelemetryManager.resetInstance();
+    process.env = { ...originalEnv };
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
   });
 
   describe('singleton behavior', () => {
@@ -147,8 +161,8 @@ describe('TelemetryManager', () => {
 
       expect(mockConfigManager.isEnabled).toHaveBeenCalled();
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://test-supabase-url.com',
+        'test-supabase-anon-key',
         expect.objectContaining({
           auth: {
             persistSession: false,
@@ -603,8 +617,8 @@ describe('TelemetryManager', () => {
 
     it('should configure Supabase client with correct options', () => {
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://test-supabase-url.com',
+        'test-supabase-anon-key',
         {
           auth: {
             persistSession: false,

@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
+import { describeIfApiAccessible } from '../utils/n8n-client';
+import { describeIfApiAccessible } from '../utils/n8n-client';
 import { createTestContext, TestContext, createTestWorkflowName } from '../utils/test-context';
 import { getTestN8nClient } from '../utils/n8n-client';
 import { N8nApiClient } from '../../../../src/services/n8n-api-client';
@@ -16,7 +18,7 @@ import { createMcpContext } from '../utils/mcp-context';
 import { InstanceContext } from '../../../../src/types/instance-context';
 import { handleGetWorkflow } from '../../../../src/mcp/handlers-n8n-manager';
 
-describe('Integration: handleGetWorkflow', () => {
+describeIfApiAccessible('Integration: handleGetWorkflow', () => {
   let context: TestContext;
   let client: N8nApiClient;
   let mcpContext: InstanceContext;
@@ -41,7 +43,7 @@ describe('Integration: handleGetWorkflow', () => {
   // Successful Retrieval
   // ======================================================================
 
-  describe('Successful Retrieval', () => {
+  describeIfApiAccessible('Successful Retrieval', () => {
     it('should retrieve complete workflow data', async () => {
       // Create a workflow first
       const workflow = {
@@ -90,7 +92,7 @@ describe('Integration: handleGetWorkflow', () => {
   // Error Handling
   // ======================================================================
 
-  describe('Error Handling', () => {
+  describeIfApiAccessible('Error Handling', () => {
     it('should return error for non-existent workflow (invalid ID)', async () => {
       const invalidId = '99999999';
 
