@@ -39,6 +39,7 @@ export function getN8nApiConfig() {
     apiKey: config.N8N_API_KEY,
     timeout: config.N8N_API_TIMEOUT,
     maxRetries: config.N8N_API_MAX_RETRIES,
+    validateBaseUrl: false,
   };
 }
 
@@ -67,6 +68,7 @@ export function getN8nApiConfigFromContext(context: {
     apiKey: context.n8nApiKey,
     timeout: context.n8nApiTimeout ?? 30000,
     maxRetries: context.n8nApiMaxRetries ?? 3,
+    validateBaseUrl: true,
   };
 }
 

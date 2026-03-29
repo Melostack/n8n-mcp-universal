@@ -23,6 +23,11 @@ export default mergeConfig(
       // Disable coverage for integration tests or set lower thresholds
       coverage: {
         enabled: false
+      },
+      // Allow localhost for integration tests (bypass strict SSRF protection)
+      env: {
+        NODE_ENV: 'test',
+        WEBHOOK_SECURITY_MODE: 'permissive'
       }
     }
   })
