@@ -46,6 +46,7 @@ import {
 } from '../utils/cache-utils';
 import { processExecution } from '../services/execution-processor';
 import { checkNpmVersion, formatVersionMessage } from '../utils/npm-version-checker';
+import * as crypto from 'crypto';
 
 // ========================================================================
 // TypeScript Interfaces for Type Safety
@@ -742,7 +743,7 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex').substring(0, 9)}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 
