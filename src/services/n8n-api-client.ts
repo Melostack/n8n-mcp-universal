@@ -365,6 +365,10 @@ export class N8nApiClient {
         params: httpMethod === 'GET' ? data : undefined,
         // Webhooks might take longer
         timeout: waitForResponse ? 120000 : 30000,
+        // SECURITY: Pin DNS resolution to validated IP to prevent DNS rebinding attacks
+        // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (CRITICAL-01)
+        // If validation returned a resolved IP (all valid cases except potential edge cases), use it
+        lookup: validation.resolvedIP ? SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family) : undefined,
       };
 
       // Create a new axios instance for webhook requests to avoid API interceptors
