@@ -25,6 +25,7 @@ import {
 } from '../utils/n8n-errors';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
+import * as crypto from 'crypto';
 import { WorkflowValidator } from '../services/workflow-validator';
 import { EnhancedConfigValidator } from '../services/enhanced-config-validator';
 import { NodeRepository } from '../database/node-repository';
@@ -742,7 +743,7 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 
