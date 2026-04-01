@@ -394,4 +394,49 @@ describe('SSRFProtection', () => {
       expect(result.valid).toBe(true);
     });
   });
+
+  describe('Synchronous Validation (validateUrlSync)', () => {
+    it('should block localhost (strict mode)', () => {
+      const result = SSRFProtection.validateUrlSync('http://localhost:3000', 'strict');
+      expect(result.valid).toBe(false);
+      expect(result.reason).toContain('Localhost blocked');
+    });
+
+    it('should allow localhost (moderate/permissive mode)', () => {
+      expect(SSRFProtection.validateUrlSync('http://localhost:3000', 'moderate').valid).toBe(true);
+      expect(SSRFProtection.validateUrlSync('http://localhost:3000', 'permissive').valid).toBe(true);
+    });
+
+    it('should block cloud metadata IP (all modes)', () => {
+      const ip = 'http://169.254.169.254/latest';
+      expect(SSRFProtection.validateUrlSync(ip, 'strict').valid).toBe(false);
+      expect(SSRFProtection.validateUrlSync(ip, 'moderate').valid).toBe(false);
+      expect(SSRFProtection.validateUrlSync(ip, 'permissive').valid).toBe(false);
+    });
+
+    it('should block cloud metadata hostname (all modes)', () => {
+      const url = 'http://metadata.google.internal/computeMetadata/v1/';
+      expect(SSRFProtection.validateUrlSync(url, 'strict').valid).toBe(false);
+      expect(SSRFProtection.validateUrlSync(url, 'moderate').valid).toBe(false);
+      expect(SSRFProtection.validateUrlSync(url, 'permissive').valid).toBe(false);
+    });
+
+    it('should block private IPs (strict mode)', () => {
+      const result = SSRFProtection.validateUrlSync('http://10.0.0.1', 'strict');
+      expect(result.valid).toBe(false);
+      expect(result.reason).toContain('Private IP');
+    });
+
+    it('should allow private IPs (permissive mode)', () => {
+      const result = SSRFProtection.validateUrlSync('http://10.0.0.1', 'permissive');
+      expect(result.valid).toBe(true);
+    });
+
+    it('should handle IPv6 private addresses correctly', () => {
+       expect(SSRFProtection.validateUrlSync('http://[::1]', 'strict').valid).toBe(false);
+       expect(SSRFProtection.validateUrlSync('http://[::1]', 'moderate').valid).toBe(true);
+       expect(SSRFProtection.validateUrlSync('http://[fc00::1]', 'strict').valid).toBe(false);
+       expect(SSRFProtection.validateUrlSync('http://[fc00::1]', 'permissive').valid).toBe(true); // Should allow in permissive
+    });
+  });
 });

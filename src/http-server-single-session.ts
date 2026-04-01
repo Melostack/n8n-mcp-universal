@@ -804,6 +804,9 @@ export class SingleSessionHTTPServer {
       logger.info(`Trust proxy enabled with ${trustProxy} hop(s)`);
     }
     
+    // Hide Express signature
+    app.disable('x-powered-by');
+
     // DON'T use any body parser globally - StreamableHTTPServerTransport needs raw stream
     // Only use JSON parser for specific endpoints that need it
     
@@ -814,6 +817,7 @@ export class SingleSessionHTTPServer {
       res.setHeader('X-Frame-Options', 'DENY');
       res.setHeader('X-XSS-Protection', '1; mode=block');
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+      res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
       next();
     });
     
