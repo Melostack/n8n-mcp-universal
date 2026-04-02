@@ -51,8 +51,9 @@ const chatInputSchema = zod_1.z.object({
     timeout: zod_1.z.number().optional(),
     waitForResponse: zod_1.z.boolean().optional(),
 });
+const crypto_1 = __importDefault(require("crypto"));
 function generateSessionId() {
-    return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    return `session_${Date.now()}_${crypto_1.default.randomBytes(8).toString('hex')}`;
 }
 class ChatHandler extends base_handler_1.BaseTriggerHandler {
     constructor() {

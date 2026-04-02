@@ -32,6 +32,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getInstanceCacheStatistics = getInstanceCacheStatistics;
 exports.getInstanceCacheMetrics = getInstanceCacheMetrics;
@@ -479,9 +482,10 @@ async function handleGetWorkflowMinimal(args, context) {
         };
     }
 }
+const crypto_1 = __importDefault(require("crypto"));
 async function handleUpdateWorkflow(args, repository, context) {
     const startTime = Date.now();
-    const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    const sessionId = `mutation_${Date.now()}_${crypto_1.default.randomBytes(8).toString('hex')}`;
     let workflowBefore = null;
     let userIntent = 'Full workflow update';
     try {
