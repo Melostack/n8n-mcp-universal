@@ -807,6 +807,9 @@ export class SingleSessionHTTPServer {
     // DON'T use any body parser globally - StreamableHTTPServerTransport needs raw stream
     // Only use JSON parser for specific endpoints that need it
     
+    // Disable X-Powered-By header for security
+    app.disable('x-powered-by');
+
     // Security headers
     app.use((req, res, next) => {
       res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
@@ -814,6 +817,7 @@ export class SingleSessionHTTPServer {
       res.setHeader('X-Frame-Options', 'DENY');
       res.setHeader('X-XSS-Protection', '1; mode=block');
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+      res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
       next();
     });
     
