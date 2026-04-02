@@ -1,0 +1,5 @@
+## 2024-05-18 - Replacing Insecure Random Generation (Math.random) with Cryptographically Secure Generators
+
+**Vulnerability:** Weak random number generation using `Math.random()` to generate security-sensitive identifiers such as session IDs, condition IDs, and node IDs. This could potentially allow for collision or predictability if attackers try to guess sessions or objects.
+**Learning:** The project was using `Math.random().toString(36).substr(2, 9)` extensively across its services (e.g. `node-sanitizer.ts`, `handlers-n8n-manager.ts`, `handlers-workflow-diff.ts`, `chat-handler.ts`, `example-generator.ts`). This is not a CSPRNG (Cryptographically Secure Pseudo-Random Number Generator) and is predictable.
+**Prevention:** Always use Node.js's native `crypto` module (`crypto.randomBytes(n).toString('hex')` or `crypto.randomUUID()`) when generating unique identifiers for security-sensitive contexts like sessions or unique database mutations. Length should be chosen efficiently (e.g., `crypto.randomBytes(5).toString('hex')` for 10 hex characters) to avoid generating excess unused bytes.
