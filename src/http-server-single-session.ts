@@ -1337,6 +1337,23 @@ export class SingleSessionHTTPServer {
       });
     });
     
+    // Add syntax error handling middleware for JSON parsing specifically here before generic error handler
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      if (err instanceof SyntaxError && 'status' in err && err.status === 400 && 'body' in err) {
+        logger.error('JSON parsing error:', err.message);
+        res.status(400).json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32700,
+            message: 'Parse error',
+          },
+          id: null
+        });
+        return;
+      }
+      next(err);
+    });
+
     // Error handler
     app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
       logger.error('Express error handler:', err);

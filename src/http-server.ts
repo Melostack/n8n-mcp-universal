@@ -377,8 +377,23 @@ export async function startFixedHTTPServer() {
       
       req.on('end', async () => {
         try {
-          const jsonRpcRequest = JSON.parse(body);
-          logger.debug('Received JSON-RPC request:', { method: jsonRpcRequest.method });
+          let jsonRpcRequest;
+          try {
+            jsonRpcRequest = JSON.parse(body);
+          } catch (e) {
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = 400;
+            res.json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32700,
+                message: 'Parse error',
+              },
+              id: null
+            });
+            return;
+          }
+          logger.debug('Received JSON-RPC request:', { method: jsonRpcRequest?.method });
           
           // Handle the request based on method
           let response;
