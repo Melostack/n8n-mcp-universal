@@ -24,6 +24,7 @@ import {
   formatNoExecutionError
 } from '../utils/n8n-errors';
 import { logger } from '../utils/logger';
+import * as crypto from 'crypto';
 import { z } from 'zod';
 import { WorkflowValidator } from '../services/workflow-validator';
 import { EnhancedConfigValidator } from '../services/enhanced-config-validator';
@@ -742,7 +743,8 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  // Security enhancement: use crypto instead of Math.random() to generate secure and unpredictable identifier.
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 

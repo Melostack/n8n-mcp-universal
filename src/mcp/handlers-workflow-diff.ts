@@ -10,6 +10,7 @@ import { WorkflowDiffEngine } from '../services/workflow-diff-engine';
 import { getN8nApiClient } from './handlers-n8n-manager';
 import { N8nApiError, getUserFriendlyErrorMessage } from '../utils/n8n-errors';
 import { logger } from '../utils/logger';
+import * as crypto from 'crypto';
 import { InstanceContext } from '../types/instance-context';
 import { validateWorkflowStructure } from '../services/n8n-validation';
 import { NodeRepository } from '../database/node-repository';
@@ -76,7 +77,8 @@ export async function handleUpdatePartialWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  // Security enhancement: use crypto instead of Math.random() to generate secure and unpredictable identifier.
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let validationBefore: any = null;
   let validationAfter: any = null;
