@@ -940,17 +940,19 @@ describe('N8nApiClient', () => {
       
       const result = await client.triggerWebhook(webhookRequest);
       
-      expect(mockWebhookClient.request).toHaveBeenCalledWith({
-        method: 'POST',
-        url: '/webhook/abc-123',
-        headers: {
-          'Custom-Header': 'test',
-          'X-N8N-API-KEY': undefined,
-        },
-        data: { key: 'value' },
-        params: undefined,
-        timeout: 30000,
-      });
+      expect(mockWebhookClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: '/webhook/abc-123',
+          headers: {
+            'Custom-Header': 'test',
+            'X-N8N-API-KEY': undefined,
+          },
+          data: { key: 'value' },
+          params: undefined,
+          timeout: 30000,
+        })
+      );
       
       expect(result).toEqual(response);
     });

@@ -367,6 +367,10 @@ export class N8nApiClient {
         timeout: waitForResponse ? 120000 : 30000,
       };
 
+      if (validation.resolvedIP && validation.family) {
+        config.lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+      }
+
       // Create a new axios instance for webhook requests to avoid API interceptors
       const webhookClient = axios.create({
         baseURL: new URL('/', webhookUrl).toString(),

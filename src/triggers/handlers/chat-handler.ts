@@ -109,6 +109,10 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
         validateStatus: (status) => status < 500,
       };
 
+      if (validation.resolvedIP && validation.family) {
+        config.lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+      }
+
       // Make the request (sync mode - no streaming)
       const response = await axios.request(config);
 
