@@ -1,0 +1,4 @@
+## 2025-04-03 - [Insecure Randomness for Identifiers]
+**Vulnerability:** Use of `Math.random()` to generate unique identifiers (session IDs, condition IDs, node IDs). `Math.random()` is not cryptographically secure and can lead to predictable IDs, which is a risk for session tracking and node operations.
+**Learning:** Hardcoded ID generation logic sprinkled across multiple files often bypasses standard security libraries. It is important to rely on native `crypto` module built into Node.js instead of web-like `Math.random().toString(36)` patterns for anything related to uniqueness or session tracking.
+**Prevention:** Enforce linting rules (like `eslint-plugin-security` or `@typescript-eslint/no-restricted-imports`) to flag the use of `Math.random()` for identifier generation. Always use `crypto.randomBytes()` or `crypto.randomUUID()`.

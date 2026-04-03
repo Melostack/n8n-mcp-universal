@@ -1,5 +1,6 @@
 import { N8nApiClient } from '../services/n8n-api-client';
 import { getN8nApiConfig, getN8nApiConfigFromContext } from '../config/n8n-api';
+import crypto from 'crypto';
 import {
   Workflow,
   WorkflowNode,
@@ -742,7 +743,7 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 

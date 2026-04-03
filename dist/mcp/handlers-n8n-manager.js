@@ -32,6 +32,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getInstanceCacheStatistics = getInstanceCacheStatistics;
 exports.getInstanceCacheMetrics = getInstanceCacheMetrics;
@@ -58,6 +61,7 @@ exports.handleDeployTemplate = handleDeployTemplate;
 exports.handleTriggerWebhookWorkflow = handleTriggerWebhookWorkflow;
 const n8n_api_client_1 = require("../services/n8n-api-client");
 const n8n_api_1 = require("../config/n8n-api");
+const crypto_1 = __importDefault(require("crypto"));
 const n8n_api_2 = require("../types/n8n-api");
 const n8n_validation_1 = require("../services/n8n-validation");
 const n8n_errors_1 = require("../utils/n8n-errors");
@@ -481,7 +485,7 @@ async function handleGetWorkflowMinimal(args, context) {
 }
 async function handleUpdateWorkflow(args, repository, context) {
     const startTime = Date.now();
-    const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    const sessionId = `mutation_${Date.now()}_${crypto_1.default.randomBytes(5).toString('hex')}`;
     let workflowBefore = null;
     let userIntent = 'Full workflow update';
     try {
