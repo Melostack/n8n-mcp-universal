@@ -407,6 +407,10 @@ export class FormHandler extends BaseTriggerHandler<FormTriggerInput> {
         validateStatus: (status) => status < 500,
       };
 
+      if (validation.resolvedIP && validation.family) {
+        config.lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+      }
+
       // Make the request
       const response = await axios.request(config);
 
