@@ -120,10 +120,12 @@ class NodeRepository {
     }
     getAllNodes(limit) {
         let sql = 'SELECT * FROM nodes ORDER BY display_name';
+        const params = [];
         if (limit) {
-            sql += ` LIMIT ${limit}`;
+            sql += ` LIMIT ?`;
+            params.push(limit);
         }
-        const rows = this.db.prepare(sql).all();
+        const rows = this.db.prepare(sql).all(...params);
         return rows.map(row => this.parseNodeRow(row));
     }
     getNodeCount() {
