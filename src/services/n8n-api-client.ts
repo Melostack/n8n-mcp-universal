@@ -337,43 +337,68 @@ export class N8nApiClient {
   // Webhook Execution
   async triggerWebhook(request: WebhookRequest): Promise<any> {
     try {
-      const { webhookUrl, httpMethod, data, headers, waitForResponse = true } = request;
+      let currentUrl = request.webhookUrl;
+      const { httpMethod, data, headers, waitForResponse = true } = request;
 
-      // SECURITY: Validate URL for SSRF protection (includes DNS resolution)
-      // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (HIGH-03)
       const { SSRFProtection } = await import('../utils/ssrf-protection');
-      const validation = await SSRFProtection.validateWebhookUrl(webhookUrl);
+      const http = await import('http');
+      const https = await import('https');
 
-      if (!validation.valid) {
-        throw new Error(`SSRF protection: ${validation.reason}`);
+      let response: any = null;
+      let redirectCount = 0;
+      const maxRedirects = 5; // Standard safe limit
+
+      while (redirectCount <= maxRedirects) {
+        // SECURITY: Validate URL for SSRF protection (includes DNS resolution)
+        // See: https://github.com/czlonkowski/n8n-mcp/issues/265 (HIGH-03)
+        const validation = await SSRFProtection.validateWebhookUrl(currentUrl);
+
+        if (!validation.valid || !validation.resolvedIP) {
+          throw new Error(`SSRF protection: ${validation.reason}`);
+        }
+
+        // Configure DNS pinning to prevent DNS rebinding attacks
+        const lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+        const agentOptions = { lookup };
+
+        // Make request directly to webhook endpoint
+        const config: AxiosRequestConfig = {
+          method: httpMethod,
+          url: currentUrl,
+          headers: {
+            ...headers,
+            // Don't override API key header for webhook endpoints
+            'X-N8N-API-KEY': undefined,
+          },
+          data: httpMethod !== 'GET' ? data : undefined,
+          params: httpMethod === 'GET' ? data : undefined,
+          // Webhooks might take longer
+          timeout: waitForResponse ? 120000 : 30000,
+          // Apply DNS pinned agents
+          httpAgent: new http.Agent(agentOptions),
+          httpsAgent: new https.Agent(agentOptions),
+          // Disable standard redirects so we can validate each redirect target
+          maxRedirects: 0,
+          validateStatus: (status: number) => status < 500, // Handle redirects ourselves
+        };
+
+        const webhookClient = axios.create();
+
+        response = await webhookClient.request(config);
+
+        // Handle redirects manually to ensure SSRF validation on every hop
+        if (response.status >= 300 && response.status < 400 && response.headers.location) {
+          redirectCount++;
+          if (redirectCount > maxRedirects) {
+            throw new Error(`Too many redirects (max ${maxRedirects})`);
+          }
+          currentUrl = new URL(response.headers.location, currentUrl).toString();
+          logger.debug(`Webhook redirected to: ${currentUrl}`);
+          continue; // Loop again and validate the new URL
+        }
+
+        break; // Not a redirect, break the loop
       }
-
-      // Extract path from webhook URL
-      const url = new URL(webhookUrl);
-      const webhookPath = url.pathname;
-      
-      // Make request directly to webhook endpoint
-      const config: AxiosRequestConfig = {
-        method: httpMethod,
-        url: webhookPath,
-        headers: {
-          ...headers,
-          // Don't override API key header for webhook endpoints
-          'X-N8N-API-KEY': undefined,
-        },
-        data: httpMethod !== 'GET' ? data : undefined,
-        params: httpMethod === 'GET' ? data : undefined,
-        // Webhooks might take longer
-        timeout: waitForResponse ? 120000 : 30000,
-      };
-
-      // Create a new axios instance for webhook requests to avoid API interceptors
-      const webhookClient = axios.create({
-        baseURL: new URL('/', webhookUrl).toString(),
-        validateStatus: (status: number) => status < 500, // Don't throw on 4xx
-      });
-
-      const response = await webhookClient.request(config);
       
       return {
         status: response.status,

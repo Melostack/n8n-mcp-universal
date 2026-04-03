@@ -1,0 +1,4 @@
+## 2025-03-05 - [SSRF bypass via DNS Rebinding and HTTP Redirects]
+**Vulnerability:** The application performed URL validation for SSRF protection but passed the same URL to `axios` directly. This allowed an attacker to bypass SSRF protection either by using DNS rebinding (changing the DNS record after validation but before the request) or by pointing the URL to an external server that returns an HTTP redirect to an internal IP.
+**Learning:** URL validation alone is insufficient for SSRF protection because the underlying HTTP client will resolve DNS again and automatically follow redirects.
+**Prevention:** Always implement DNS pinning by passing a custom lookup function to the HTTP client (e.g., using `http.Agent` and `https.Agent` in Axios) and manually handle HTTP redirects to validate every URL in the redirect chain.

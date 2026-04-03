@@ -263,9 +263,16 @@ export class FormHandler extends BaseTriggerHandler<FormTriggerInput> {
       // SSRF protection
       const { SSRFProtection } = await import('../../utils/ssrf-protection');
       const validation = await SSRFProtection.validateWebhookUrl(formUrl);
-      if (!validation.valid) {
+      if (!validation.valid || !validation.resolvedIP) {
         return this.errorResponse(input, `SSRF protection: ${validation.reason}`, startTime);
       }
+
+      // Configure DNS pinning to prevent DNS rebinding attacks
+      const lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+      const agentOptions = { lookup };
+
+      const http = await import('http');
+      const https = await import('https');
 
       // Build multipart/form-data (required by n8n form triggers)
       const formData = new FormData();
@@ -405,6 +412,8 @@ export class FormHandler extends BaseTriggerHandler<FormTriggerInput> {
         data: formData,
         timeout: input.timeout || (input.waitForResponse !== false ? 120000 : 30000),
         validateStatus: (status) => status < 500,
+        httpAgent: new http.Agent(agentOptions),
+        httpsAgent: new https.Agent(agentOptions),
       };
 
       // Make the request

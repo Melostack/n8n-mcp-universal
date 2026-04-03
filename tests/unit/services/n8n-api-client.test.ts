@@ -29,6 +29,13 @@ vi.mock('../../../src/services/n8n-validation', () => ({
   cleanWorkflowForUpdate: vi.fn((workflow) => workflow),
 }));
 
+vi.mock('../../../src/utils/ssrf-protection', () => ({
+  SSRFProtection: {
+    validateWebhookUrl: vi.fn(async () => ({ valid: true, reason: '' })),
+    getAxiosLookup: vi.fn(),
+  },
+}));
+
 // We don't need to mock n8n-errors since we want the actual error transformation to work
 
 describe('N8nApiClient', () => {
@@ -888,6 +895,15 @@ describe('N8nApiClient', () => {
     });
 
     it('should trigger webhook with GET method', async () => {
+      const { SSRFProtection } = await import('../../../src/utils/ssrf-protection');
+      vi.mocked(SSRFProtection.validateWebhookUrl).mockResolvedValue({
+        valid: true,
+        reason: '',
+        resolvedIP: '192.168.1.1',
+        family: 4,
+      });
+      vi.mocked(SSRFProtection.getAxiosLookup).mockReturnValue((() => {}) as any);
+
       const webhookRequest = {
         webhookUrl: 'https://n8n.example.com/webhook/abc-123',
         httpMethod: 'GET' as const,
@@ -908,15 +924,21 @@ describe('N8nApiClient', () => {
       
       const result = await client.triggerWebhook(webhookRequest);
       
-      expect(axios.create).toHaveBeenCalledWith({
-        baseURL: 'https://n8n.example.com/',
-        validateStatus: expect.any(Function),
-      });
+      expect(axios.create).toHaveBeenCalled();
       
       expect(result).toEqual(response);
     });
 
     it('should trigger webhook with POST method', async () => {
+      const { SSRFProtection } = await import('../../../src/utils/ssrf-protection');
+      vi.mocked(SSRFProtection.validateWebhookUrl).mockResolvedValue({
+        valid: true,
+        reason: '',
+        resolvedIP: '192.168.1.1',
+        family: 4,
+      });
+      vi.mocked(SSRFProtection.getAxiosLookup).mockReturnValue((() => {}) as any);
+
       const webhookRequest = {
         webhookUrl: 'https://n8n.example.com/webhook/abc-123',
         httpMethod: 'POST' as const,
@@ -940,17 +962,20 @@ describe('N8nApiClient', () => {
       
       const result = await client.triggerWebhook(webhookRequest);
       
-      expect(mockWebhookClient.request).toHaveBeenCalledWith({
-        method: 'POST',
-        url: '/webhook/abc-123',
-        headers: {
-          'Custom-Header': 'test',
-          'X-N8N-API-KEY': undefined,
-        },
-        data: { key: 'value' },
-        params: undefined,
-        timeout: 30000,
-      });
+      expect(mockWebhookClient.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: 'https://n8n.example.com/webhook/abc-123',
+          headers: {
+            'Custom-Header': 'test',
+            'X-N8N-API-KEY': undefined,
+          },
+          data: { key: 'value' },
+          params: undefined,
+          timeout: 30000,
+          maxRedirects: 0,
+        })
+      );
       
       expect(result).toEqual(response);
     });
