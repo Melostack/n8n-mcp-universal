@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sanitizeNode = sanitizeNode;
 exports.sanitizeWorkflowNodes = sanitizeWorkflowNodes;
 exports.validateNodeMetadata = validateNodeMetadata;
 const logger_1 = require("../utils/logger");
+const crypto_1 = __importDefault(require("crypto"));
 function sanitizeNode(node) {
     const sanitized = { ...node };
     if (isFilterBasedNode(node.type, node.typeVersion)) {
@@ -137,7 +141,7 @@ function isUnaryOperator(operation) {
     return unaryOps.includes(operation);
 }
 function generateConditionId() {
-    return `condition-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `condition-${Date.now()}-${crypto_1.default.randomBytes(5).toString('hex')}`;
 }
 function validateNodeMetadata(node) {
     const issues = [];
