@@ -22,6 +22,7 @@ vi.mock('../../../../src/config/n8n-api', () => ({
 vi.mock('../../../../src/utils/ssrf-protection', () => ({
   SSRFProtection: {
     validateWebhookUrl: vi.fn(async () => ({ valid: true, reason: '' })),
+    getAxiosLookup: vi.fn(),
   },
 }));
 
@@ -79,7 +80,10 @@ describe('FormHandler', () => {
     vi.mocked(SSRFProtection.validateWebhookUrl).mockResolvedValue({
       valid: true,
       reason: '',
+      resolvedIP: '192.168.1.1',
+      family: 4,
     });
+    vi.mocked(SSRFProtection.getAxiosLookup).mockReturnValue((() => {}) as any);
 
     // Reset axios mock
     vi.mocked(axios.request).mockResolvedValue({

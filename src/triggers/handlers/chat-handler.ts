@@ -80,9 +80,16 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
       // SSRF protection
       const { SSRFProtection } = await import('../../utils/ssrf-protection');
       const validation = await SSRFProtection.validateWebhookUrl(chatUrl);
-      if (!validation.valid) {
+      if (!validation.valid || !validation.resolvedIP) {
         return this.errorResponse(input, `SSRF protection: ${validation.reason}`, startTime);
       }
+
+      // Configure DNS pinning to prevent DNS rebinding attacks
+      const lookup = SSRFProtection.getAxiosLookup(validation.resolvedIP, validation.family);
+      const agentOptions = { lookup };
+
+      const http = await import('http');
+      const https = await import('https');
 
       // Generate or use provided session ID
       const sessionId = input.sessionId || generateSessionId();
@@ -107,6 +114,8 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
         data: chatPayload,
         timeout: input.timeout || (input.waitForResponse !== false ? 120000 : 30000),
         validateStatus: (status) => status < 500,
+        httpAgent: new http.Agent(agentOptions),
+        httpsAgent: new https.Agent(agentOptions),
       };
 
       // Make the request (sync mode - no streaming)
