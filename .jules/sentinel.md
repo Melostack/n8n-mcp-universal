@@ -1,0 +1,4 @@
+## 2025-05-18 - [SQL Injection in node-repository.ts]
+**Vulnerability:** A SQL injection vulnerability existed in `NodeRepository.getAllNodes` where the `limit` parameter was directly interpolated into the SQL query string (`LIMIT ${limit}`).
+**Learning:** Even parameters that are expected to be numeric (like `limit`) can be exploited if they are not strictly validated or parameterized. String concatenation/interpolation should be avoided for any parameters used in database queries.
+**Prevention:** Always use parameterized queries (`?`) for all variables passed to the database adapter, regardless of their expected type.
