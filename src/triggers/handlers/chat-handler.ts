@@ -9,6 +9,7 @@
 
 import { z } from 'zod';
 import axios, { AxiosRequestConfig } from 'axios';
+import * as crypto from 'crypto';
 import { Workflow } from '../../types/n8n-api';
 import {
   TriggerType,
@@ -36,9 +37,10 @@ const chatInputSchema = z.object({
 
 /**
  * Generate a unique session ID
+ * Security enhancement: use crypto instead of Math.random() to generate secure and unpredictable identifier.
  */
 function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  return `session_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
 }
 
 /**
