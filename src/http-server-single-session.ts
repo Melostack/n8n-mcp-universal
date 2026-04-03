@@ -473,7 +473,6 @@ export class SingleSessionHTTPServer {
           method: req.method,
           url: req.url,
           bodyType: typeof req.body,
-          bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
           existingTransports: Object.keys(this.transports),
           isInitializeRequest: isInitialize
         });
@@ -919,9 +918,7 @@ export class SingleSessionHTTPServer {
       logger.info('TEST ENDPOINT: Manual test request received', {
         method: req.method,
         headers: req.headers,
-        body: req.body,
-        bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined'
+        bodyType: typeof req.body
       });
       
       // Negotiate protocol version for test endpoint
@@ -1149,7 +1146,6 @@ export class SingleSessionHTTPServer {
         readableEnded: req.readableEnded,
         complete: req.complete,
         bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
         contentLength: req.get('content-length'),
         contentType: req.get('content-type'),
         userAgent: req.get('user-agent'),
