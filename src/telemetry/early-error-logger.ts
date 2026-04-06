@@ -12,7 +12,6 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { TelemetryConfigManager } from './config-manager';
-import { TELEMETRY_BACKEND } from './telemetry-types';
 import { StartupCheckpoint, isValidCheckpoint, getCheckpointDescription } from './startup-checkpoints';
 import { sanitizeErrorMessageCore } from './error-sanitization-utils';
 import { logger } from '../utils/logger';
@@ -73,8 +72,12 @@ export class EarlyErrorLogger {
    */
   private async initialize(): Promise<void> {
     try {
+      // Use environment variables for telemetry
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
       // Validate backend configuration before using
-      if (!TELEMETRY_BACKEND.URL || !TELEMETRY_BACKEND.ANON_KEY) {
+      if (!supabaseUrl || !supabaseAnonKey) {
         logger.debug('Telemetry backend not configured, early error logger disabled');
         this.enabled = false;
         return;
@@ -92,8 +95,8 @@ export class EarlyErrorLogger {
 
       // Initialize Supabase client for direct inserts
       this.supabase = createClient(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        supabaseUrl,
+        supabaseAnonKey,
         {
           auth: {
             persistSession: false,

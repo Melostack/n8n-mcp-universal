@@ -4,7 +4,6 @@ import { TelemetryConfigManager } from '../../../src/telemetry/config-manager';
 import { TelemetryEventTracker } from '../../../src/telemetry/event-tracker';
 import { TelemetryBatchProcessor } from '../../../src/telemetry/batch-processor';
 import { createClient } from '@supabase/supabase-js';
-import { TELEMETRY_BACKEND } from '../../../src/telemetry/telemetry-types';
 import { TelemetryError, TelemetryErrorType } from '../../../src/telemetry/telemetry-error';
 
 // Mock all dependencies
@@ -36,6 +35,9 @@ describe('TelemetryManager', () => {
   beforeEach(() => {
     // Reset singleton using the new method
     TelemetryManager.resetInstance();
+    // Set env vars for tests to pass by default
+    process.env.SUPABASE_URL = 'https://default.supabase.co';
+    process.env.SUPABASE_ANON_KEY = 'default-anon-key';
 
     // Mock TelemetryConfigManager
     mockConfigManager = {
@@ -113,6 +115,8 @@ describe('TelemetryManager', () => {
   afterEach(() => {
     // Clean up global state
     TelemetryManager.resetInstance();
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_ANON_KEY;
   });
 
   describe('singleton behavior', () => {
@@ -141,14 +145,17 @@ describe('TelemetryManager', () => {
       manager = TelemetryManager.getInstance();
     });
 
-    it('should initialize successfully when enabled', () => {
+    it('should initialize successfully when enabled and env vars are present', () => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-anon-key';
+
       // Trigger initialization by calling a tracking method
       manager.trackEvent('test', {});
 
       expect(mockConfigManager.isEnabled).toHaveBeenCalled();
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://custom.supabase.co',
+        'custom-anon-key',
         expect.objectContaining({
           auth: {
             persistSession: false,
@@ -159,9 +166,9 @@ describe('TelemetryManager', () => {
       expect(mockBatchProcessor.start).toHaveBeenCalled();
     });
 
-    it('should use environment variables if provided', () => {
-      process.env.SUPABASE_URL = 'https://custom.supabase.co';
-      process.env.SUPABASE_ANON_KEY = 'custom-anon-key';
+    it('should not initialize when env vars are missing', () => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
 
       // Reset instance to trigger re-initialization
       TelemetryManager.resetInstance();
@@ -170,15 +177,8 @@ describe('TelemetryManager', () => {
       // Trigger initialization
       manager.trackEvent('test', {});
 
-      expect(createClient).toHaveBeenCalledWith(
-        'https://custom.supabase.co',
-        'custom-anon-key',
-        expect.any(Object)
-      );
-
-      // Clean up
-      delete process.env.SUPABASE_URL;
-      delete process.env.SUPABASE_ANON_KEY;
+      expect(createClient).not.toHaveBeenCalled();
+      expect(mockBatchProcessor.start).not.toHaveBeenCalled();
     });
 
     it('should not initialize when disabled', () => {
@@ -596,6 +596,8 @@ describe('TelemetryManager', () => {
 
   describe('Supabase client configuration', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-anon-key';
       manager = TelemetryManager.getInstance();
       // Trigger initialization
       manager.trackEvent('test', {});
@@ -603,8 +605,8 @@ describe('TelemetryManager', () => {
 
     it('should configure Supabase client with correct options', () => {
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://custom.supabase.co',
+        'custom-anon-key',
         {
           auth: {
             persistSession: false,
