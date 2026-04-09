@@ -1,0 +1,4 @@
+## 2026-04-09 - [Insecure Random Number Generation for Session IDs]
+**Vulnerability:** The `chat-handler.ts` used `Math.random()` to generate unique session IDs. `Math.random()` is predictable and not cryptographically secure, which could allow an attacker to predict session IDs, leading to potential session collisions or hijacking.
+**Learning:** Even non-critical identifiers like session IDs shouldn't use weak PRNGs since predicting them can provide attack surfaces. A specific pattern existed here where string manipulation (`toString(36).substring(2,11)`) was used to trim randomness, which indicates poor entropy handling.
+**Prevention:** Always use Node.js's built-in `crypto` module (e.g., `crypto.randomBytes(5).toString('hex')`) for generating secure unique identifiers, rather than relying on `Math.random()`. Also, match byte count closely to desired hex character length (5 bytes = 10 hex characters).
