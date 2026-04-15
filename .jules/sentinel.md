@@ -1,0 +1,4 @@
+## 2024-03-24 - Replace insecure Math.random() with crypto
+**Vulnerability:** Usage of insecure Math.random() function for generating unique identifiers (such as session IDs and condition IDs) in src/mcp/handlers-n8n-manager.ts, src/mcp/handlers-workflow-diff.ts, src/services/node-sanitizer.ts, and src/triggers/handlers/chat-handler.ts.
+**Learning:** Developers sometimes fall back on Math.random() because it's available natively without any imports, not realizing it produces predictable values that can lead to enumeration attacks or ID collisions when used for security boundaries.
+**Prevention:** Always use the built-in Node.js crypto module (e.g., crypto.randomBytes(5).toString('hex') or crypto.randomUUID()) for cryptographically secure random generation, especially for identifiers tied to sessions, mutations, or conditions.
