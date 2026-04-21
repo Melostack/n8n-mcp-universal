@@ -74,6 +74,7 @@ const mockExpressApp = {
   use: vi.fn(),
   get: vi.fn(),
   post: vi.fn(),
+  disable: vi.fn().mockReturnThis(),
   listen: vi.fn((port: any, host: any, callback: any) => {
     // Call the callback immediately to simulate server start
     if (callback) callback();
