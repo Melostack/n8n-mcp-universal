@@ -211,7 +211,10 @@ describe('HTTP Server Session Management', () => {
   function findHandler(method: 'get' | 'post' | 'delete', path: string) {
     const routes = mockHandlers[method];
     const route = routes.find(r => r.path === path);
-    return route ? route.handlers[route.handlers.length - 1] : null;
+    if (!route) return null;
+    // We want the actual handler, which is the last one in the handlers array
+    // (previous ones might be middleware like rate limiting, json parsing, etc.)
+    return route.handlers[route.handlers.length - 1];
   }
 
   function createMockReqRes() {
