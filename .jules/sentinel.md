@@ -1,0 +1,4 @@
+## 2026-05-02 - [Missing Rate Limit on Legacy MCP Endpoint]
+ **Vulnerability:** The deprecated HTTP server implementation (`src/http-server.ts`) handled authentication for the `/mcp` endpoint without rate limiting, exposing the system to brute force and DoS attacks if the legacy server was executed, despite the single-session server having protections.
+ **Learning:** Security patches (like `express-rate-limit`) applied to primary active components must also be backported or symmetrically applied to deprecated but still-existing components to prevent bypasses via legacy paths.
+ **Prevention:** Ensure security middleware and configurations are extracted into shared utility functions or consistently applied across all server variants, even deprecated ones, until they are completely removed from the codebase.
