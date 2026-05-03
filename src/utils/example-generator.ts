@@ -1,6 +1,8 @@
 /**
  * Generates example workflows and parameters for n8n nodes
  */
+import * as crypto from 'crypto';
+
 export class ExampleGenerator {
   /**
    * Generate an example workflow from node definition
@@ -99,8 +101,9 @@ export class ExampleGenerator {
    * Generate a unique node ID
    */
   private static generateNodeId(): string {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15);
+// SECURITY: Use cryptographically secure random bytes for node IDs (CWE-338)
+    return crypto.randomBytes(16).toString('hex');
+
   }
 
   /**

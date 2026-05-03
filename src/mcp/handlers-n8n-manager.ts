@@ -45,6 +45,7 @@ import {
   getCacheStatistics
 } from '../utils/cache-utils';
 import { processExecution } from '../services/execution-processor';
+import * as crypto from 'crypto';
 import { checkNpmVersion, formatVersionMessage } from '../utils/npm-version-checker';
 
 // ========================================================================
@@ -742,7 +743,8 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  // SECURITY: Use cryptographically secure random bytes for session IDs (CWE-338)
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 

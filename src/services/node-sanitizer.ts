@@ -12,6 +12,7 @@
 import { INodeParameters } from 'n8n-workflow';
 import { logger } from '../utils/logger';
 import { WorkflowNode } from '../types/n8n-api';
+import * as crypto from 'crypto';
 
 /**
  * Sanitize a single node by adding required metadata
@@ -248,7 +249,8 @@ function isUnaryOperator(operation: string): boolean {
  * Generate unique condition ID
  */
 function generateConditionId(): string {
-  return `condition-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // SECURITY: Use cryptographically secure random bytes for condition IDs (CWE-338)
+  return `condition-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
 }
 
 /**
