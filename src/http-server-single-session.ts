@@ -467,13 +467,13 @@ export class SingleSessionHTTPServer {
         const isInitialize = req.body ? isInitializeRequest(req.body) : false;
         
         // Log comprehensive incoming request details for debugging
+        // SECURITY: Do not log raw HTTP request payloads to prevent exposing sensitive data
         logger.info('handleRequest: Processing MCP request - SDK PATTERN', {
           requestId: req.get('x-request-id') || 'unknown',
           sessionId: sessionId,
           method: req.method,
           url: req.url,
-          bodyType: typeof req.body,
-          bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
+          hasBody: !!req.body,
           existingTransports: Object.keys(this.transports),
           isInitializeRequest: isInitialize
         });
@@ -916,12 +916,11 @@ export class SingleSessionHTTPServer {
     
     // Test endpoint for manual testing without auth
     app.post('/mcp/test', jsonParser, async (req: express.Request, res: express.Response): Promise<void> => {
+      // SECURITY: Do not log raw HTTP request payloads or headers to prevent exposing sensitive data
       logger.info('TEST ENDPOINT: Manual test request received', {
         method: req.method,
-        headers: req.headers,
-        body: req.body,
-        bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined'
+        hasHeaders: !!req.headers,
+        hasBody: !!req.body
       });
       
       // Negotiate protocol version for test endpoint
@@ -1143,13 +1142,13 @@ export class SingleSessionHTTPServer {
     // Main MCP endpoint with authentication and rate limiting
     app.post('/mcp', authLimiter, jsonParser, async (req: express.Request, res: express.Response): Promise<void> => {
       // Log comprehensive debug info about the request
+      // SECURITY: Do not log raw HTTP request payloads or headers to prevent exposing sensitive data
       logger.info('POST /mcp request received - DETAILED DEBUG', {
-        headers: req.headers,
+        hasHeaders: !!req.headers,
         readable: req.readable,
         readableEnded: req.readableEnded,
         complete: req.complete,
-        bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
+        hasBody: !!req.body,
         contentLength: req.get('content-length'),
         contentType: req.get('content-type'),
         userAgent: req.get('user-agent'),
