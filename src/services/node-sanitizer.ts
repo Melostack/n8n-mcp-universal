@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 /**
  * Node Sanitizer Service
  *
@@ -248,7 +249,8 @@ function isUnaryOperator(operation: string): boolean {
  * Generate unique condition ID
  */
 function generateConditionId(): string {
-  return `condition-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // SECURITY: Generate secure condition IDs using crypto module instead of Math.random()
+  return `condition-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
 }
 
 /**

@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 /**
  * MCP Handler for Partial Workflow Updates
  * Handles diff-based workflow modifications
@@ -76,7 +77,8 @@ export async function handleUpdatePartialWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  // SECURITY: Generate secure mutation IDs using crypto module instead of Math.random()
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let validationBefore: any = null;
   let validationAfter: any = null;

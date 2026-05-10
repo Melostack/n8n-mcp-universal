@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 /**
  * Generates example workflows and parameters for n8n nodes
  */
@@ -99,8 +100,10 @@ export class ExampleGenerator {
    * Generate a unique node ID
    */
   private static generateNodeId(): string {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15);
+    // SECURITY: Generate secure Node IDs using crypto module instead of Math.random()
+    // Using Math.random() can lead to identifier collisions.
+    return crypto.randomBytes(8).toString('hex') +
+           crypto.randomBytes(8).toString('hex');
   }
 
   /**
