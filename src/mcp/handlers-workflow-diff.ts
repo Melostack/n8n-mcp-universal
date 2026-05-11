@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import { McpToolResponse } from '../types/n8n-api';
+import * as crypto from 'crypto';
 import { WorkflowDiffRequest, WorkflowDiffOperation } from '../types/workflow-diff';
 import { WorkflowDiffEngine } from '../services/workflow-diff-engine';
 import { getN8nApiClient } from './handlers-n8n-manager';
@@ -76,7 +77,7 @@ export async function handleUpdatePartialWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let validationBefore: any = null;
   let validationAfter: any = null;
