@@ -473,7 +473,7 @@ export class SingleSessionHTTPServer {
           method: req.method,
           url: req.url,
           bodyType: typeof req.body,
-          bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
+          hasBody: !!req.body,
           existingTransports: Object.keys(this.transports),
           isInitializeRequest: isInitialize
         });
@@ -918,10 +918,9 @@ export class SingleSessionHTTPServer {
     app.post('/mcp/test', jsonParser, async (req: express.Request, res: express.Response): Promise<void> => {
       logger.info('TEST ENDPOINT: Manual test request received', {
         method: req.method,
-        headers: req.headers,
-        body: req.body,
-        bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined'
+        hasHeaders: !!req.headers,
+        hasBody: !!req.body,
+        bodyType: typeof req.body
       });
       
       // Negotiate protocol version for test endpoint
@@ -1144,12 +1143,12 @@ export class SingleSessionHTTPServer {
     app.post('/mcp', authLimiter, jsonParser, async (req: express.Request, res: express.Response): Promise<void> => {
       // Log comprehensive debug info about the request
       logger.info('POST /mcp request received - DETAILED DEBUG', {
-        headers: req.headers,
+        hasHeaders: !!req.headers,
         readable: req.readable,
         readableEnded: req.readableEnded,
         complete: req.complete,
         bodyType: typeof req.body,
-        bodyContent: req.body ? JSON.stringify(req.body, null, 2) : 'undefined',
+        hasBody: !!req.body,
         contentLength: req.get('content-length'),
         contentType: req.get('content-type'),
         userAgent: req.get('user-agent'),
