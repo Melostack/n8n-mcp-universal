@@ -1,0 +1,4 @@
+## 2024-03-20 - [SQL Injection in SQLite Query Building]
+**Vulnerability:** Found string concatenation being used for the `LIMIT` clause in SQL queries (`sql += \` LIMIT ${limit}\`;`) even though the parameter was typed as a number.
+**Learning:** While TypeScript provides compile-time safety (e.g. `limit?: number`), it does not protect against runtime data where a string might be passed, leading to potential SQL injection.
+**Prevention:** Always use parameterized queries (e.g., `LIMIT ?`) for all variable inputs in SQL queries, regardless of their TypeScript type, to ensure runtime safety against SQL injection.
