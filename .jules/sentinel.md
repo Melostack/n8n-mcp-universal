@@ -1,0 +1,4 @@
+## 2025-05-24 - [SQL Injection via Unparameterized LIMIT Clause]
+**Vulnerability:** The `getAllNodes(limit?: number)` function in `src/database/node-repository.ts` used string interpolation (`LIMIT ${limit}`) instead of parameter binding. Since arguments like `limit` are passed through the MCP engine (e.g., `args.limit` in `src/mcp-tools-engine.ts`) with type `any`, they bypass TypeScript type checking. An attacker could potentially inject malicious SQL by passing a non-numeric string as the limit.
+**Learning:** Even parameters expected to be numeric (like `limit`) must be parameterized if they originate from unvalidated upstream sources, especially JSON-RPC requests via the MCP engine where TypeScript types are erased (`any`).
+**Prevention:** Always use parameterized queries (`?` or named parameters) for all dynamic SQL components, including `LIMIT` and `OFFSET` clauses, instead of template string interpolation.
