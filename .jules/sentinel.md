@@ -1,0 +1,4 @@
+## 2024-03-20 - [SQL Injection via Type Bypassing in JSON-RPC Inputs]
+**Vulnerability:** SQL Injection via string interpolation of numeric arguments (`LIMIT ${limit}`) in database queries.
+**Learning:** `any` types from JSON-RPC inputs in the MCP engine bypass TypeScript's type system, making seemingly safe numeric parameters (like `limit`) vulnerable to SQL injection if stringly interpolated into SQL queries instead of using parameterized bindings.
+**Prevention:** Always use parameterized query bindings (`?` or named parameters) for all database inputs, even for values expected to be numeric like `limit` or `offset`, especially when inputs originate from loosely-typed JSON-RPC endpoints.
