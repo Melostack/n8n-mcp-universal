@@ -1,0 +1,4 @@
+## 2024-05-27 - [Secure Session ID Generation]
+**Vulnerability:** Weak pseudorandom number generation using `Math.random()` to generate session IDs in `chat-handler.ts`. `Math.random()` is not cryptographically secure and predictable, which could theoretically allow an attacker to guess session IDs if they are used for sensitive state management or tracking.
+**Learning:** Found multiple usages of `Math.random()` scattered in the codebase, particularly for unique ID generation, session IDs, and backoff jitter. Using `Math.random()` for any security-sensitive identification is a recurring anti-pattern to watch out for.
+**Prevention:** Always use Node.js's built-in `crypto` module (e.g., `crypto.randomBytes()`, `crypto.randomUUID()`) when generating random strings, session IDs, or security tokens to guarantee sufficient entropy.
