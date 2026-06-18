@@ -368,10 +368,22 @@ export class N8nApiClient {
       };
 
       // Create a new axios instance for webhook requests to avoid API interceptors
-      const webhookClient = axios.create({
+      // Create a custom agent to handle DNS pinning if IP was resolved
+      // This is crucial for preventing DNS rebinding during the actual request
+      const requestOptions: any = {
         baseURL: new URL('/', webhookUrl).toString(),
         validateStatus: (status: number) => status < 500, // Don't throw on 4xx
-      });
+      };
+
+      if (validation.resolvedIP) {
+        // Implement DNS pinning - force axios to use the IP we just validated
+        requestOptions.lookup = SSRFProtection.getAxiosLookup(
+          validation.resolvedIP,
+          validation.family
+        );
+      }
+
+      const webhookClient = axios.create(requestOptions);
 
       const response = await webhookClient.request(config);
       

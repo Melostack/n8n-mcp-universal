@@ -407,6 +407,14 @@ export class FormHandler extends BaseTriggerHandler<FormTriggerInput> {
         validateStatus: (status) => status < 500,
       };
 
+      // Implement DNS pinning if IP was resolved
+      if (validation.resolvedIP) {
+        (config as any).lookup = SSRFProtection.getAxiosLookup(
+          validation.resolvedIP,
+          validation.family
+        );
+      }
+
       // Make the request
       const response = await axios.request(config);
 

@@ -908,10 +908,12 @@ describe('N8nApiClient', () => {
       
       const result = await client.triggerWebhook(webhookRequest);
       
-      expect(axios.create).toHaveBeenCalledWith({
-        baseURL: 'https://n8n.example.com/',
-        validateStatus: expect.any(Function),
-      });
+      expect(axios.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseURL: 'https://n8n.example.com/',
+          validateStatus: expect.any(Function),
+        })
+      );
       
       expect(result).toEqual(response);
     });

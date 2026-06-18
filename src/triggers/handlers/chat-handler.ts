@@ -109,6 +109,14 @@ export class ChatHandler extends BaseTriggerHandler<ChatTriggerInput> {
         validateStatus: (status) => status < 500,
       };
 
+      // Implement DNS pinning if IP was resolved
+      if (validation.resolvedIP) {
+        (config as any).lookup = SSRFProtection.getAxiosLookup(
+          validation.resolvedIP,
+          validation.family
+        );
+      }
+
       // Make the request (sync mode - no streaming)
       const response = await axios.request(config);
 

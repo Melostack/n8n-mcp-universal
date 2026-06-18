@@ -70,9 +70,17 @@ export class SSRFProtection {
    * const result = await SSRFProtection.validateWebhookUrl('http://localhost:5678');
    * // { valid: true }
    */
+  static getAxiosLookup(resolvedIP: string, family: number = 4) {
+    return (hostname: string, options: any, callback: (err: Error | null, address: any, family?: any) => void) => {
+      callback(null, resolvedIP, family);
+    };
+  }
+
   static async validateWebhookUrl(urlString: string): Promise<{
     valid: boolean;
-    reason?: string
+    reason?: string;
+    resolvedIP?: string;
+    family?: number;
   }> {
     try {
       const url = new URL(urlString);
@@ -99,11 +107,13 @@ export class SSRFProtection {
       // Step 3: Resolve DNS to get actual IP address
       // This prevents DNS rebinding attacks where hostname resolves to different IPs
       let resolvedIP: string;
+      let resolvedFamily: number;
       try {
-        const { address } = await lookup(hostname);
+        const { address, family } = await lookup(hostname);
         resolvedIP = address;
+        resolvedFamily = family;
 
-        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, mode });
+        logger.debug('DNS resolved for SSRF check', { hostname, resolvedIP, family: resolvedFamily, mode });
       } catch (error) {
         logger.warn('DNS resolution failed for webhook URL', {
           hostname,
@@ -130,7 +140,7 @@ export class SSRFProtection {
           hostname,
           resolvedIP
         });
-        return { valid: true };
+        return { valid: true, resolvedIP, family: resolvedFamily };
       }
 
       // Check if target is localhost
@@ -150,7 +160,7 @@ export class SSRFProtection {
       // MODE: moderate - Allow localhost, block private IPs
       if (mode === 'moderate' && isLocalhost) {
         logger.info('Localhost webhook allowed (moderate mode)', { hostname, resolvedIP });
-        return { valid: true };
+        return { valid: true, resolvedIP, family: resolvedFamily };
       }
 
       // Step 6: Check private IPv4 ranges (strict & moderate modes)
@@ -179,7 +189,7 @@ export class SSRFProtection {
         return { valid: false, reason: 'IPv6 private address not allowed' };
       }
 
-      return { valid: true };
+      return { valid: true, resolvedIP, family: resolvedFamily };
     } catch (error) {
       return { valid: false, reason: 'Invalid URL format' };
     }
