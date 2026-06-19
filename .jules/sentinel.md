@@ -1,0 +1,4 @@
+## 2024-06-25 - [SQL Injection via MCP Tool Engine inputs]
+**Vulnerability:** SQL Injection in `NodeRepository.getAllNodes` caused by unsanitized/unparameterized `limit` input passed directly from MCP JSON-RPC requests via `mcp-tools-engine.ts`.
+**Learning:** Inputs originating from JSON-RPC requests via the MCP engine (e.g. `args.limit`) bypass TypeScript type checking (typed as `any`). These untyped inputs can reach the database adapter directly without being sanitized or converted to numbers, allowing for SQL injection in the `LIMIT` clause when using template strings instead of parameterization.
+**Prevention:** Always use parameterized queries (e.g., `LIMIT ?`) for database calls, even for parameters that are expected to be numeric like limits or offsets, especially when the inputs originate from untrusted or dynamically typed sources like JSON-RPC.
