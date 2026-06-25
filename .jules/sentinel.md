@@ -1,0 +1,4 @@
+## 2025-06-25 - [SQL Injection via MCP Engine Inputs]
+**Vulnerability:** SQL injection vulnerability in `NodeRepository.getAllNodes` caused by concatenating the `limit` argument directly into the query string (`LIMIT ${limit}`).
+**Learning:** Inputs originating from JSON-RPC requests via the MCP engine (e.g., `args.limit` in `src/mcp-tools-engine.ts`) are typed as `any`, bypassing TypeScript type checking. If untrusted inputs are concatenated directly into SQL queries without validation, it allows arbitrary SQL execution, even for parameters typically expected to be numbers.
+**Prevention:** When constructing SQL queries using the database adapter, always use parameterized bindings (`?` or named parameters) instead of template string interpolation, even for expected numeric parameters like `limit`.
