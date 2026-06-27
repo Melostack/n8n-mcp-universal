@@ -1,0 +1,4 @@
+## 2026-06-27 - [SQL Injection in SQLite Adapter Fix]
+**Vulnerability:** Found a SQL injection vulnerability in `getAllNodes` within `src/database/node-repository.ts`. The `limit` parameter, potentially controlled by untrusted JSON-RPC clients via `args.limit`, was directly concatenated into the SQL string.
+**Learning:** Even strictly internal repositories can become vulnerable when exposed via MCP tools where inputs lack strict typing (e.g., `args.limit` typed as `any`). Unparameterized structural variables in SQLite queries can easily bypass naive application logic.
+**Prevention:** Always enforce parameterized queries (using `?` bindings) even for integer types like `LIMIT`. Relying solely on presumed integer typing is insufficient defense against SQL injection when data bridges trust boundaries like MCP.
