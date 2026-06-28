@@ -220,7 +220,9 @@ export class NodeRepository {
   getAllNodes(limit?: number): any[] {
     let sql = 'SELECT * FROM nodes ORDER BY display_name';
     if (limit) {
-      sql += ` LIMIT ${limit}`;
+      sql += ` LIMIT ?`;
+      const rows = this.db.prepare(sql).all(limit) as any[];
+      return rows.map(row => this.parseNodeRow(row));
     }
     
     const rows = this.db.prepare(sql).all() as any[];
