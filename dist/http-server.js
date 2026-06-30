@@ -90,12 +90,14 @@ async function startFixedHTTPServer() {
         'See: https://github.com/czlonkowski/n8n-mcp/issues/524');
     validateEnvironment();
     const app = (0, express_1.default)();
+    app.disable('x-powered-by');
     const trustProxy = process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : 0;
     if (trustProxy > 0) {
         app.set('trust proxy', trustProxy);
         logger_1.logger.info(`Trust proxy enabled with ${trustProxy} hop(s)`);
     }
     app.use((req, res, next) => {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');
         res.setHeader('X-XSS-Protection', '1; mode=block');

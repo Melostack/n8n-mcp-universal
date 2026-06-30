@@ -1,0 +1,4 @@
+## 2025-02-28 - [SQL Injection in Database Read Methods via MCP Arguments]
+**Vulnerability:** The `getAllNodes` method concatenated an untrusted `limit` parameter directly into an SQL statement (`sql += \` LIMIT \${limit}\``) causing SQL Injection, despite `limit` seemingly being expected as a number.
+**Learning:** Inputs coming from JSON-RPC requests via the MCP engine (like `args.limit` in `src/mcp-tools-engine.ts`) are typed as `any` and bypass TypeScript type-checking entirely. A string containing SQL syntax can be passed as `limit` unchecked, causing SQL Injection when concatenated into SQL statements.
+**Prevention:** Always use parameterized bindings (`?` or named parameters) via the database adapter (`this.db.prepare().all(...params)`) even for variables expected to be primitives like `limit`, especially when input boundaries lack robust runtime type validation (e.g. MCP arguments).
