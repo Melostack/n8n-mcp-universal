@@ -35,6 +35,7 @@ import { ExpressionFormatValidator, ExpressionFormatIssue } from '../services/ex
 import { WorkflowVersioningService } from '../services/workflow-versioning-service';
 import { handleUpdatePartialWorkflow } from './handlers-workflow-diff';
 import { telemetry } from '../telemetry';
+import * as crypto from 'crypto';
 import { TemplateService } from '../templates/template-service';
 import {
   createCacheKey,
@@ -742,7 +743,7 @@ export async function handleUpdateWorkflow(
   context?: InstanceContext
 ): Promise<McpToolResponse> {
   const startTime = Date.now();
-  const sessionId = `mutation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+  const sessionId = `mutation_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
   let workflowBefore: any = null;
   let userIntent = 'Full workflow update';
 

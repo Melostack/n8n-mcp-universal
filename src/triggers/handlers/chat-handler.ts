@@ -17,6 +17,7 @@ import {
   DetectedTrigger,
   ChatTriggerInput,
 } from '../types';
+import * as crypto from 'crypto';
 import { BaseTriggerHandler } from './base-handler';
 import { buildTriggerUrl } from '../trigger-detector';
 
@@ -38,7 +39,7 @@ const chatInputSchema = z.object({
  * Generate a unique session ID
  */
 function generateSessionId(): string {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  return `session_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
 }
 
 /**
