@@ -219,11 +219,14 @@ export class NodeRepository {
 
   getAllNodes(limit?: number): any[] {
     let sql = 'SELECT * FROM nodes ORDER BY display_name';
-    if (limit) {
-      sql += ` LIMIT ${limit}`;
+    const params: any[] = [];
+
+    if (limit !== undefined && limit !== null) {
+      sql += ' LIMIT ?';
+      params.push(limit);
     }
     
-    const rows = this.db.prepare(sql).all() as any[];
+    const rows = this.db.prepare(sql).all(...params) as any[];
     return rows.map(row => this.parseNodeRow(row));
   }
 
