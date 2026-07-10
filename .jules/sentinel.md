@@ -1,0 +1,5 @@
+
+## 2026-07-10 - [Fix SQL Injection in node-repository.ts getAllNodes]
+**Vulnerability:** The `limit` parameter in `getAllNodes` method of `src/database/node-repository.ts` was interpolated directly into the SQL query string (`sql += \` LIMIT ${limit}\``) instead of using parameterized queries. Since this method is exposed via MCP tools (`MCPEngine.listNodes` maps to it) and receives unvalidated JSON-RPC inputs that bypass TypeScript checks, it created a SQL Injection vulnerability.
+**Learning:** Even simple numeric expected parameters like `limit` must be parameterized when constructing SQL queries because the inputs often originate from untyped external sources like JSON-RPC endpoints that bypass TypeScript type constraints.
+**Prevention:** Always use parameterized bindings (`?` or named parameters) via the database adapter (e.g. `this.db.prepare(sql).all(...params)`) rather than template string interpolation when constructing SQL queries, regardless of the parameter's expected type.
