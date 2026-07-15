@@ -142,13 +142,16 @@ describe('TelemetryManager', () => {
     });
 
     it('should initialize successfully when enabled', () => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-anon-key';
+
       // Trigger initialization by calling a tracking method
       manager.trackEvent('test', {});
 
       expect(mockConfigManager.isEnabled).toHaveBeenCalled();
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://custom.supabase.co',
+        'custom-anon-key',
         expect.objectContaining({
           auth: {
             persistSession: false,
@@ -157,6 +160,9 @@ describe('TelemetryManager', () => {
         })
       );
       expect(mockBatchProcessor.start).toHaveBeenCalled();
+
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should use environment variables if provided', () => {
@@ -207,7 +213,14 @@ describe('TelemetryManager', () => {
 
   describe('event tracking methods', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should track tool usage with sequence update', () => {
@@ -316,7 +329,15 @@ describe('TelemetryManager', () => {
 
   describe('flush()', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+      manager.trackEvent('test', {}); // initialize
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should flush events and workflows', async () => {
@@ -389,7 +410,14 @@ describe('TelemetryManager', () => {
 
   describe('enable/disable functionality', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should disable telemetry', () => {
@@ -422,9 +450,16 @@ describe('TelemetryManager', () => {
 
   describe('getMetrics()', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
       // Trigger initialization for enabled tests
       manager.trackEvent('test', {});
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should return comprehensive metrics when enabled', () => {
@@ -474,7 +509,14 @@ describe('TelemetryManager', () => {
 
   describe('error handling and aggregation', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should aggregate initialization errors', () => {
@@ -530,7 +572,14 @@ describe('TelemetryManager', () => {
 
   describe('isEnabled() privacy', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should correctly check enabled state', async () => {
@@ -558,6 +607,16 @@ describe('TelemetryManager', () => {
   });
 
   describe('dependency injection and callbacks', () => {
+    beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
+    });
+
     it('should provide correct callbacks to EventTracker', () => {
       const TelemetryEventTrackerMock = vi.mocked(TelemetryEventTracker);
 
@@ -596,15 +655,22 @@ describe('TelemetryManager', () => {
 
   describe('Supabase client configuration', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-anon-key';
       manager = TelemetryManager.getInstance();
       // Trigger initialization
       manager.trackEvent('test', {});
     });
 
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
+    });
+
     it('should configure Supabase client with correct options', () => {
       expect(createClient).toHaveBeenCalledWith(
-        TELEMETRY_BACKEND.URL,
-        TELEMETRY_BACKEND.ANON_KEY,
+        'https://custom.supabase.co',
+        'custom-anon-key',
         {
           auth: {
             persistSession: false,
@@ -622,7 +688,14 @@ describe('TelemetryManager', () => {
 
   describe('workflow creation auto-flush behavior', () => {
     beforeEach(() => {
+      process.env.SUPABASE_URL = 'https://custom.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'custom-key';
       manager = TelemetryManager.getInstance();
+    });
+
+    afterEach(() => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_ANON_KEY;
     });
 
     it('should auto-flush after successful workflow tracking', async () => {
