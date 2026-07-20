@@ -1,0 +1,4 @@
+## 2024-05-24 - [Rate Limiting Legitimate Traffic DoS]
+ **Vulnerability:** Brute-force rate limiting was applied to the `/mcp` authentication endpoint without `skipSuccessfulRequests: true`. Additionally, the deprecated `src/http-server.ts` completely lacked rate limiting.
+ **Learning:** Without `skipSuccessfulRequests`, every request (even successful authenticated calls from a legitimate user) increments the rate limit counter. An active user using many tools can quickly hit the limit (e.g., 20 requests/15min) and lock themselves out. Furthermore, missing symmetric patches on legacy systems creates bypass routes.
+ **Prevention:** Always configure `skipSuccessfulRequests: true` for endpoint limiters intended *only* to block brute-force authentication attempts. Ensure security controls are applied consistently across all active API routers/entrypoints (e.g., legacy vs. modern).
