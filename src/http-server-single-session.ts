@@ -1113,6 +1113,7 @@ export class SingleSessionHTTPServer {
     const authLimiter = rateLimit({
       windowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW || '900000'), // 15 minutes
       max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20'), // 20 authentication attempts per IP
+      skipSuccessfulRequests: true, // Only count failed attempts
       message: {
         jsonrpc: '2.0',
         error: {

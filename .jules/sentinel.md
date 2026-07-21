@@ -1,0 +1,4 @@
+## 2026-07-21 - [Added express-rate-limit to http-server.ts and fixed skipSuccessfulRequests]
+**Vulnerability:** The deprecated `src/http-server.ts` lacked brute-force authentication protection (rate limiting) entirely, and the primary `src/http-server-single-session.ts` rate limiter counted successful authentication attempts towards the brute-force limit.
+**Learning:** Symmetric application of security middleware across all server implementations (including legacy/deprecated code paths if they remain accessible) is crucial to prevent bypasses. Furthermore, rate limiters configured to stop brute forcing *must* set `skipSuccessfulRequests: true` to avoid a subtle Denial of Service where legitimate traffic triggers the block intended for attackers.
+**Prevention:** Always verify that rate limiting middleware correctly distinguishes between success and failure states, and audit legacy entry points for symmetric security controls.
