@@ -546,7 +546,7 @@ describe('HTTP Server n8n Mode', () => {
 
       // The 404 handler is added with app.use() without a path
       // Find the last middleware that looks like a 404 handler
-      const notFoundHandler = mockHandlers.use[mockHandlers.use.length - 2]; // Second to last (before error handler)
+      const notFoundHandler = mockHandlers.use.find((m: any) => m.length === 2); // Function taking (req, res)
 
       const { req, res } = createMockReqRes();
       req.method = 'POST';
@@ -565,7 +565,7 @@ describe('HTTP Server n8n Mode', () => {
       server = new SingleSessionHTTPServer();
       await server.start();
 
-      const notFoundHandler = mockHandlers.use[mockHandlers.use.length - 2];
+      const notFoundHandler = mockHandlers.use.find((m: any) => m.length === 2);
 
       const { req, res } = createMockReqRes();
       req.method = 'GET';
