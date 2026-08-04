@@ -1,0 +1,40 @@
+name: Close superseded bot PRs
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close-superseded:
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.event.pull_request.title, '🛡️ Sentinel:') ||
+      startsWith(github.event.pull_request.title, '⚡ Bolt:') ||
+      startsWith(github.event.pull_request.title, '🎨 Palette:')
+    steps:
+      - name: Close older open PRs from the same category
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          case "$PR_TITLE" in
+            "🛡️ Sentinel:"*) PREFIX="🛡️ Sentinel:" ;;
+            "⚡ Bolt:"*) PREFIX="⚡ Bolt:" ;;
+            "🎨 Palette:"*) PREFIX="🎨 Palette:" ;;
+            *) echo "No matching prefix, skipping."; exit 0 ;;
+          esac
+
+          gh pr list --repo "$REPO" --state open --json number,title \
+            --jq ".[] | select(.number != $PR_NUMBER) | select(.title | startswith(\"$PREFIX\")) | .number" \
+          | while read -r num; do
+              echo "Closing superseded PR #$num (category: $PREFIX)"
+              gh pr close "$num" --repo "$REPO" \
+                --comment "Fechado automaticamente: superado por #$PR_NUMBER (mesma categoria: $PREFIX)."
+            done
