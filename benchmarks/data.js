@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773886069984,
+  "lastUpdate": 1785864208914,
   "repoUrl": "https://github.com/Melostack/n8n-mcp-universal",
   "entries": {
     "n8n-mcp Benchmarks": [
@@ -240,6 +240,37 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Melostack/n8n-mcp-universal/commit/8970c87f5b169fae7f6c7608074162a9443cd192"
         },
         "date": 1773886069510,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "sample - array sorting - small",
+            "value": 0.0136,
+            "range": "0.3096",
+            "unit": "ms",
+            "extra": "73341 ops/sec"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "backup.matheusmelo@gmail.com",
+            "name": "Matheus “Melostack” MeloX",
+            "username": "Melostack"
+          },
+          "committer": {
+            "email": "backup.matheusmelo@gmail.com",
+            "name": "Matheus “Melostack” MeloX",
+            "username": "Melostack"
+          },
+          "distinct": true,
+          "id": "92a92f5d6e6e2b522655ef8d5d9956f1fd46f41d",
+          "message": "ci: auto-close superseded Jules bot PRs (Sentinel/Bolt/Palette)",
+          "timestamp": "2026-08-04T14:20:26-03:00",
+          "tree_id": "d6c0918b5910f9e3f8b13232e5425427bd76ae46",
+          "url": "https://github.com/Melostack/n8n-mcp-universal/commit/92a92f5d6e6e2b522655ef8d5d9956f1fd46f41d"
+        },
+        "date": 1785864208163,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
