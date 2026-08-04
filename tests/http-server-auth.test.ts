@@ -71,7 +71,7 @@ const mockServer = {
 
 // Mock Express to prevent server from starting
 const mockExpressApp = {
-  use: vi.fn(),
+  use: vi.fn(), disable: vi.fn().mockReturnThis(),
   get: vi.fn(),
   post: vi.fn(),
   listen: vi.fn((port: any, host: any, callback: any) => {

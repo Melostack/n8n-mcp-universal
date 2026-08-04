@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix Auth Rate Limiter Configuration
+**Vulnerability:** The \`express-rate-limit\` configuration for the authentication endpoint in \`src/http-server.ts\` and \`src/http-server-single-session.ts\` lacked the \`skipSuccessfulRequests: true\` flag.
+**Learning:** This is a subtle DoS vulnerability (exhaustion of rate limit). If a legitimate user accesses the MCP endpoint normally, their successful requests (which present valid credentials) could still consume the rate limit window meant to throttle invalid authentication attempts (brute-forcing). This could lock out a legitimate user simply by them making frequent normal API calls.
+**Prevention:** Always verify that brute-force rate limiters, specifically those configured to throttle authentication, differentiate between successful and failed requests. Use \`skipSuccessfulRequests: true\` on authentication endpoints where successful calls are frequent.

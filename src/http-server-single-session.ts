@@ -1123,6 +1123,7 @@ export class SingleSessionHTTPServer {
       },
       standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
       legacyHeaders: false, // Disable `X-RateLimit-*` headers
+      skipSuccessfulRequests: true, // Prevent legitimate API traffic from exhausting the limit
       handler: (req, res) => {
         logger.warn('Rate limit exceeded', {
           ip: req.ip,
