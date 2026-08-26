@@ -447,4 +447,21 @@ describe('NodeRepository - Core Functionality', () => {
       expect(result?.hasToolVariant).toBe(false);
     });
   });
+  describe('getAllNodes', () => {
+    it('binds zero as a real SQL limit', () => {
+      repository.getAllNodes(0);
+
+      const statement = mockAdapter._getStatement(
+        'SELECT * FROM nodes ORDER BY display_name LIMIT ?'
+      );
+      expect(statement?.all).toHaveBeenCalledWith(0);
+    });
+
+    it('rejects unsafe runtime limits', () => {
+      for (const limit of [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, '1']) {
+        expect(() => repository.getAllNodes(limit as any)).toThrow(RangeError);
+      }
+    });
+  });
+
 });
