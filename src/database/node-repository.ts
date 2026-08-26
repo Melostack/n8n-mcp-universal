@@ -221,7 +221,10 @@ export class NodeRepository {
     let sql = 'SELECT * FROM nodes ORDER BY display_name';
     const params: any[] = [];
 
-    if (limit) {
+    if (limit !== undefined) {
+      if (!Number.isSafeInteger(limit) || limit < 0) {
+        throw new RangeError('limit must be a non-negative safe integer');
+      }
       sql += ' LIMIT ?';
       params.push(limit);
     }
