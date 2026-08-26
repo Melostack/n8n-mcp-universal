@@ -1,0 +1,4 @@
+## 2024-05-18 - [SQL Injection Vulnerability in getAllNodes]
+**Vulnerability:** Found a SQL injection vulnerability in `src/database/node-repository.ts` where the user-provided `limit` variable was directly interpolated into the SQL query string in the `getAllNodes` method (e.g. `sql += \` LIMIT ${limit}\`;`).
+**Learning:** Even parameters expected to be numeric (like `limit`) need to be handled via parameterized queries, especially when data origins could stem from weakly typed sources (e.g. MCP JSON-RPC). Typescript types don't provide runtime protection.
+**Prevention:** Always use parameterized query bindings (`?` or named parameters) for all user-controllable inputs within SQL statements constructed via `better-sqlite3`, avoiding string interpolation universally.
