@@ -1,0 +1,4 @@
+## 2024-05-18 - Fix SQL Injection in node-repository
+**Vulnerability:** A SQL injection vulnerability was found in `src/database/node-repository.ts` where user-controlled limit parameters were directly concatenated into the SQL string via template literals (`sql += \` LIMIT ${limit}\`;`). The limit parameter came directly from the MCP engine `args.limit` typed as `any`.
+**Learning:** This highlights the importance of always using parameterized queries (`?`) for all variables, including numbers like `limit` and `offset`, when directly accessing the database using `better-sqlite3`. Unvalidated parameters bypassing TypeScript boundaries via `any` can easily reach the database layer.
+**Prevention:** Avoid string interpolation or string concatenation for variables when building SQL statements. Always pass variables via the parameter array in `db.prepare(sql).all(...params)`. Enforce stricter typing and parameter validation at the MCP engine layer.
